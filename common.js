@@ -18,7 +18,7 @@ function updateButtons() {
                 backgroundColor: '#0f630f',
                 url : 'http://localhost:8080/button1',
                 method : 'GET',
-                data : {id:'111'},
+                data : '{id:userId}',
                 function : 'console.log("button 1      omg")',
             },
             {
@@ -36,7 +36,26 @@ function updateButtons() {
                 backgroundColor: '#0063ff',
                 url : 'http://localhost:8080/button2',
                 method : 'GET',
-                data : {id:'222'},
+                data : '{id:userId}',
+                function : 'console.log("button 2      omg")',
+                css: '{"color": "red", "position": "absolute"}'
+            },
+            {
+                name : 3,
+                width : 350,
+                height : 500,
+                posX : 1000,
+                posY : 500,
+                borderStyle: 'solid',
+                borderRadius: 20,
+                borderWidth: 2,
+                font: 'Ariel',
+                fontSize: 16,
+                color: '#ff00ff',
+                backgroundColor: '#f063af',
+                url : 'http://localhost:8080/button2',
+                method : 'GET',
+                data : '{id:userId}',
                 function : 'console.log("button 2      omg")',
                 css: '{"color": "red", "position": "absolute"}'
             },
@@ -64,21 +83,19 @@ function updateButtons() {
             borderStyle: buttonData.borderStyle,
             borderRadius: buttonData.borderRadius + 'px',
             borderWidth: buttonData.borderWidth + 'px',
-            font: buttonData.font + 'px',
+            font: buttonData.font,
             fontSize: buttonData.fontSize + 'px',
             color: buttonData.color,
             backgroundColor: buttonData.backgroundColor,
         });
-        // overwrite stuff with what they request
-        // $button.css(JSON.parse(buttonDetails.css));
-
+        
         // Add an event listener to the button
         $button.on('click', function() {
             // Make the HTTP request based on the button attributes
             $.ajax({
                 url: buttonData.url,
                 method: buttonData.method,
-                data: buttonData.data,
+                data: eval('(' + buttonData.data + ')'),
                 success: function(response) {
                     eval(buttonData.function);
                     console.log('Button clicked:', response);
@@ -90,6 +107,8 @@ function updateButtons() {
                 }
             });
         });
+
+        $button.data('buttonData', buttonData);
 
         $('#button-container').append($button);
     })

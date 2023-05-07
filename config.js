@@ -49,12 +49,18 @@ function createButton() {
     setButtonVal(button);
     buttons.push(button);
 
+    addButtonToDropDown(button);
+}
+
+function addButtonToDropDown(button)
+{
     $('#button-dropdown').append(`<option id="${button.id}" value="${button.name}">${button.name}</option>`);
 }
 
 function editButton() {
     const editButton = $('#edit-button');
     const createButton = $('#create-button');
+    const buttonDropDown = $('#button-dropdown');
     const destroyButton = $('#destroy-button');
     const id = $('#button-dropdown option:selected').attr('id');
     const selectedButton = buttons[id];
@@ -75,6 +81,7 @@ function editButton() {
 
         destroyButton.show();
         createButton.show();
+        buttonDropDown.show();
         
     // Edit button was pressed, toggle to save mode
     } else {
@@ -86,6 +93,7 @@ function editButton() {
 
         destroyButton.hide();
         createButton.hide();
+        buttonDropDown.hide();
     }
 }
   
@@ -147,23 +155,32 @@ function loadButtons() {
 
     if(twitch.configuration.broadcaster){
         console.log("config exists")
-    try {
-        var config = JSON.parse(twitch.configuration.broadcaster.content)
-        if(typeof config === "object"){
-            buttons = config
-            updateButtons()
-        } else {
+        try {
+            var config = JSON.parse(twitch.configuration.broadcaster.content)
+            if(typeof config === "object"){
+                loadButtonsArray(config);
+                updateButtons();
+            } else {
+                console.log('invalid config')
+            }
+        } catch(e) {
             console.log('invalid config')
-        }
-    } catch(e) {
-        console.log('invalid config')
-    }
+        }   
 
-    // Update the dropdown options
-    buttons.forEach((button) => {
-        $('#button-dropdown').append(`<option value="${button.name}">${button.name}</option>`);
-    });
+        // Update the dropdown options
+        buttons.forEach((button) => {
+            addButtonToDropDown(button);
+        });
     }
+}
+
+function loadButtonsArray(arr)
+{
+    buttons = arr;
+
+    // assign the id's for later use
+    for (let i = 0; i < buttons.length; i++)
+        buttons[i].id = i;
 }
 
 function updateConfig(){
@@ -275,7 +292,7 @@ function validateForm() {
     if (!validateJavaScriptCode(func.val()))
     {
         func.addClass('error-field');
-        func.after('<span class="error-message">Please enter a valid Javascript code.</span>');
+        func.after('<span class="error-message">Please enter valid Javascript code.</span>');
         isValid = false;
     }
     

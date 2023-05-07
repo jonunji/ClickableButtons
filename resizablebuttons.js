@@ -1,40 +1,50 @@
-// $(document).ready(function() {
-//     // Function to update button size and position based on screen size
-//     function updateButtonSizeAndPosition() {
-//         var screenWidth = $(window).width();
-//         var screenHeight = $(window).height();
+var targetWidth = 1920;
 
-//         $('.custom-button').each(function() {
-//             var button = $(this);
-//             var curWidth = button.width();
-//             var curHeight = button.height();
-//             var curPosX = button.position().left;
-//             var curPosY = button.position().top;
+$(document).ready(function() {
+    // Initialize previous window width
+    var prevWindowWidth = $(window).width();
+    var prevWindowHeight = $(window).height();
 
-//             var widthPercentage = (curWidth / screenWidth) * 100;
-//             var heightPercentage = (curHeight / screenHeight) * 100;
-//             var posXPercentage = (curPosX / screenWidth) * 100;
-//             var posYPercentage = (curPosY / screenHeight) * 100;
+    $(window).on('resize', function() {
 
-//             var buttonWidth = screenWidth * (widthPercentage / 100);
-//             var buttonHeight = screenHeight * (heightPercentage / 100);
-//             var buttonPosX = screenWidth * (posXPercentage / 100) - (buttonWidth / 2);
-//             var buttonPosY = screenHeight * (posYPercentage / 100) - (buttonHeight / 2);
+        // Will always be 16:9, so we only need to consider one dimension
+        const windowWidth = $(window).width();
+        const scale = windowWidth / targetWidth;
+        
+        console.log("prev: ", prevWindowWidth, ", ", prevWindowHeight)
+        console.log("curr: ", windowWidth, ", ", scale)
+    
+        // Iterate over each button
+        $('.custom-button').each(function() {
 
-//             button.css({
-//                 width: buttonWidth,
-//                 height: buttonHeight,
-//                 left: buttonPosX,
-//                 top: buttonPosY
-//             });
-//         });
-//     }
-
-//     // Call the update function initially
-//     updateButtonSizeAndPosition();
-
-//     // Call the update function on window resize
-//     $(window).resize(function() {
-//         updateButtonSizeAndPosition();
-//     });
-// });
+            // Get the current button position and size
+            const buttonLeft = parseFloat($(this).data('buttonData').posX);
+            const buttonTop = parseFloat($(this).data('buttonData').posY);
+            const buttonWidth = parseFloat($(this).data('buttonData').width);
+            const buttonHeight = parseFloat($(this).data('buttonData').height);
+            const buttonBorderRadius = parseFloat($(this).data('buttonData').borderRadius);
+            const buttonBorderWidth = parseFloat($(this).data('buttonData').borderWidth);
+            const buttonFontSize = parseFloat($(this).data('buttonData').fontSize);
+            
+            // Calculate the new button position/height based on the scale factor
+            const newButtonLeft = scale * buttonLeft;
+            const newButtonTop = scale * buttonTop;
+            const newButtonWidth = scale * buttonWidth;
+            const newButtonHeight = scale * buttonHeight;
+            const newButtonBorderRadius = scale * buttonBorderRadius;
+            const newButtonBorderWidth = scale * buttonBorderWidth;
+            const newButtonFontSize = scale * buttonFontSize;
+    
+            // Set the new button position
+            $(this).css({
+                left : newButtonLeft + 'px',
+                top : newButtonTop + 'px',
+                width: newButtonWidth + 'px',
+                height: newButtonHeight + 'px',
+                borderRadius: newButtonBorderRadius + 'px',
+                borderWidth: newButtonBorderWidth + 'px',
+                fontSize: newButtonFontSize + 'px',
+            });
+        });
+    });
+})  

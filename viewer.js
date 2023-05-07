@@ -1,4 +1,4 @@
-var token, userId;
+var token, userId = 222;
 var buttons = [];
 updateButtons();
 
@@ -56,4 +56,4 @@ function updateConfig(){
 
 twitch.onError(function(error) {
     console.log(error);
-})
+})  
