@@ -28,21 +28,40 @@
   
       <label for="button-posy">Button Position Y (pixels):</label>
       <input type="number" id="button-posy" name="button-posy" value="10"><br>
-  
-      <label for="button-border">Button Border:</label>
-      <input type="text" id="button-border" name="button-border" value="2px solid black"><br>
       
+      <label for="button-border-style">Button Border Style:</label>
+      <select id="button-border-style" name="button-border-style">
+        <option value="none">none</option>
+        <option value="hidden">hidden</option>
+        <option value="dotted">dotted</option>
+        <option value="dashed">dashed</option>
+        <option value="solid">solid</option>
+        <option value="double">double</option>
+        <option value="groove">groove</option>
+        <option value="ridge">ridge</option>
+        <option value="inset">inset</option>
+        <option value="outset">outset</option>
+        <option value="initial">initial</option>
+        <option value="inherit">inherit</option>
+      </select><br>
+
+      <label for="button-border-radius">Button Border Radius:</label>
+      <input type="number" id="button-border-radius" name="button-border-radius" value="2"><br>
+  
+      <label for="button-border-width">Button Border Width:</label>
+      <input type="number" id="button-border-width" name="button-border-width" value="2"><br>
+
       <label for="button-font">Button Font:</label>
       <input type="text" id="button-font" name="button-font" value="Arial"><br>
       
       <label for="button-font-size">Button Font Size:</label>
-      <input type="text" id="button-font-size" name="button-font-size" value="16px"><br>
+      <input type="number" id="button-font-size" name="button-font-size" value="16"><br>
       
       <label for="button-color">Button Color:</label>
-      <input type="text" id="button-color" name="button-color" value="black"><br>
+      <input type="color" id="button-color" name="button-color" value="#000000"><br>
       
       <label for="button-background-color">Button Background Color:</label>
-      <input type="text" id="button-background-color" name="button-background-color" value="white"><br>
+      <input type="color" id="button-background-color" name="button-background-color" value="#000000"><br>
       
       <label for="button-url">Button URL:</label>
       <input type="text" id="button-url" name="button-url" value="http://localhost:8080/button1"><br>
@@ -69,6 +88,6 @@
       <button type="button" id="destroy-button" onclick="destroyButton()">Delete Button</button>
     </form>
   
-  <input type="submit" value="Submit" onclick="updateConfig()">
+  <input type="submit" value="Submit" onclick="if (validateForm()) updateConfig()">
 </body>
 </html>

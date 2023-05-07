@@ -9,6 +9,13 @@ function updateButtons() {
                 height : 50,
                 posX : 10,
                 posY : 10,
+                borderStyle: 'solid',
+                borderRadius: 5,
+                borderWidth: 5,
+                font: 'Ariel',
+                fontSize: 20,
+                color: '#ffff00',
+                backgroundColor: '#0f630f',
                 url : 'http://localhost:8080/button1',
                 method : 'GET',
                 data : {id:'111'},
@@ -20,6 +27,13 @@ function updateButtons() {
                 height : 100,
                 posX : 500,
                 posY : 5,
+                borderStyle: 'solid',
+                borderRadius: 20,
+                borderWidth: 2,
+                font: 'Ariel',
+                fontSize: 16,
+                color: '#ff0000',
+                backgroundColor: '#0063ff',
                 url : 'http://localhost:8080/button2',
                 method : 'GET',
                 data : {id:'222'},
@@ -36,17 +50,24 @@ function updateButtons() {
 
 	console.log("JUST EMPTIED THE HOME PAGE");
 
-    buttons.forEach(function(buttonDetails) {
+    buttons.forEach(function(buttonData) {
         // Create the button element
-        const $button = $('<button>').text(buttonDetails.name);
+        const $button = $('<button>').text(buttonData.name);
         $button.addClass('custom-button');
         $button.addClass('resizable-button');
         $button.css({
-            width: buttonDetails.width + 'px',
-            height: buttonDetails.height + 'px',
+            width: buttonData.width + 'px',
+            height: buttonData.height + 'px',
             position: 'absolute',
-            left: buttonDetails.posX + 'px',
-            top: buttonDetails.posY + 'px',
+            left: buttonData.posX + 'px',
+            top: buttonData.posY + 'px',
+            borderStyle: buttonData.borderStyle,
+            borderRadius: buttonData.borderRadius + 'px',
+            borderWidth: buttonData.borderWidth + 'px',
+            font: buttonData.font + 'px',
+            fontSize: buttonData.fontSize + 'px',
+            color: buttonData.color,
+            backgroundColor: buttonData.backgroundColor,
         });
         // overwrite stuff with what they request
         // $button.css(JSON.parse(buttonDetails.css));
@@ -55,11 +76,11 @@ function updateButtons() {
         $button.on('click', function() {
             // Make the HTTP request based on the button attributes
             $.ajax({
-                url: buttonDetails.url,
-                method: buttonDetails.method,
-                data: buttonDetails.data,
+                url: buttonData.url,
+                method: buttonData.method,
+                data: buttonData.data,
                 success: function(response) {
-                    eval(buttonDetails.function);
+                    eval(buttonData.function);
                     console.log('Button clicked:', response);
                     // Handle success response
                 },

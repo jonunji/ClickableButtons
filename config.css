@@ -60,7 +60,15 @@ input:focus, textarea:focus {
   background: white;
   box-shadow: none;
 }
-
+input[type="color"] {
+    padding: 8px;
+    width: 100px;
+    height: 100px;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+  
 textarea {
   resize: none;
 }
@@ -106,4 +114,9 @@ button:hover {
   form {
     width: 100%;
   }
+}
+
+.error-field {
+    border: 1px solid red;
+    background-color: #FFCDD2;
 }
