@@ -1,0 +1,8 @@
+.resizable-button {
+    background-color: #ff0000;
+    color: aqua;
+    /* color: #000000; */
+    border: solid;
+    font-size: 1vw;
+    cursor: pointer;
+}

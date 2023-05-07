@@ -1,67 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" href="style.css">
   <title>Video Overlay</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+  <script src="resizablebuttons.js" type="text/javascript"></script>
 </head>
-<body>
-  <h1>Hello, World!</h1>
-  <p>This is an HTML file with a configurable server.</p>
-  
-  <button id="button1">Button 1</button>
-  <button id="button2">Button 2</button>
-
-  <script>
-
-    let userId = -1;
-
-    window.Twitch.ext.onAuthorized(function(auth) {
-        userId = auth.userId;
-        console.log("userId: " + userId);
-        // You can use the opaque identifier for further processing or API calls
-    });
-
-    $(document).ready(function() {
-      // Specify your server URL here
-      var serverUrl = "http://localhost:8080";
-
-      $("#button1").click(function() {
-        $.ajax({
-          url: serverUrl + "/button1",
-          method: "GET",
-          data: {
-            id: userId
-          },
-          success: function(response) {
-            console.log(response);
-            // Handle the response from the server
-          },
-          error: function(error) {
-            console.error(error);
-            // Handle any errors
-          }
-        });
-      });
-
-      $("#button2").click(function() {
-        $.ajax({
-          url: serverUrl + "/button2",
-          method: "GET",
-          data: {
-            id: userId
-          },
-          success: function(response) {
-            console.log(response);
-            // Handle the response from the server
-          },
-          error: function(error) {
-            console.error(error);
-            // Handle any errors
-          }
-        });
-      });
-    });
-  </script>
+<body id="button-container" style="position: relative;">
+    <h1>Hello, World!</h1>
+    <p>This is an HTML file with a configurable server.</p>
+    
+    <button class="resizable-button" id="button1">Button 1</button>
+    <button class="resizable-button" id="button2">Button 2</button>
 </body>
+<script src="common.js" type="text/javascript"></script>
+<script src="viewer.js" type="text/javascript"></script>
 </html>

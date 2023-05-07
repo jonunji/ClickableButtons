@@ -5,10 +5,17 @@ const cors = require('cors');
 
 app.use(cors()); // Enable CORS
 
-const htmlFiles = [
+const filenames = [
   'mobile.html',
   'video_overlay.html',
-  'config.html'
+  'config.html',
+  'live_config.html',
+  'config.js',
+  'common.js',
+  'resizablebuttons.js',
+  'viewer.js',
+  'style.css',
+  'config.css'
 ];
 
 // Define a route for button 1
@@ -34,7 +41,7 @@ app.get('/', (req, res) => {
 
 app.get('/:filename', (req, res) => {
     const filename = req.params.filename;
-    if (htmlFiles.includes(filename)) {
+    if (filenames.includes(filename)) {
       res.sendFile(path.join(__dirname, `${filename}`));
     } else {
       res.status(404).send('File not found');
