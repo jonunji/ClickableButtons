@@ -5,33 +5,26 @@ const cors = require('cors');
 
 app.use(cors()); // Enable CORS
 
-const filenames = [
-  'mobile.html',
-  'video_overlay.html',
-  'config.html',
-  'live_config.html',
-  'config.js',
-  'common.js',
-  'resizablebuttons.js',
-  'viewer.js',
-  'style.css',
-  'config.css'
-];
-
 // Define a route for button 1
 app.get('/button1', (req, res) => {
     // Handle button 1 logic here
     const id = req.query.id;
     console.log("Button 1 was clicked! with id: " + id);
-    res.status(200).send("Button 1 was clicked! with id: " + id);
+    res.status(200).send(req.query);
 });
 
 // Define a route for button 2
 app.get('/button2', (req, res) => {
+    data = req.query;
+    console.log("The req is ", req.query)
     // Handle button 2 logic here
-    const id = req.query.id;
+    const id = data.id;
+    data.text = "33333";
+    data.fontSize = 300;
+    console.log("The string data is ", data);
     console.log("Button 2 was clicked! with id: " + id);
-    res.status(200).send("Button 2 was clicked! with id: " + id);
+
+    res.status(200).send(data);
 });
 
 app.get('/', (req, res) => {
@@ -39,14 +32,18 @@ app.get('/', (req, res) => {
     res.send('Welcome to the homepage!');
 });
 
-app.get('/:filename', (req, res) => {
-    const filename = req.params.filename;
-    if (filenames.includes(filename)) {
-      res.sendFile(path.join(__dirname, `${filename}`));
-    } else {
-      res.status(404).send('File not found');
-    }
+app.get('/:filepath(*)', (req, res) => {
+  const filepath = req.params.filepath;
+  const requestedFile = path.join(__dirname, filepath);
+
+  res.sendFile(requestedFile, (err) => {
+      if (err) {
+          console.error(err);
+          res.status(404).send('File not found');
+      }
+  });
 });
+
 
 const port = 8080;
 app.listen(port, () => {

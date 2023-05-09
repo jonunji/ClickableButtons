@@ -1,5 +1,5 @@
 var token, userId;
-var buttons = [];
+var buttons = [], selectedButton;
 
 // so we don't have to write this out everytime 
 const twitch = window.Twitch.ext;
@@ -43,18 +43,46 @@ twitch.configuration.onChanged(function(){
 })
 
 function createButton() {
+
+    if (!validateForm()) return;
+
     // Get the values from the form inputs
     var button = {};
+    button.id = new Date().getTime();
 
     setButtonVal(button);
     buttons.push(button);
 
+    updateButtons();
+
     addButtonToDropDown(button);
+}
+
+// Gets rid of the currently selected button
+function destroyButton() {
+    var id = $('#button-dropdown option:selected').attr('id');
+
+    var index = buttons.findIndex(button => button.id == id);
+    if (index !== -1) {
+      buttons.splice(index, 1);
+    }
+    
+    // Remove the currently selected option from the dropdown
+    $('#button-dropdown option:selected').remove();
+
+    updateButtons();
+    selectButton();
 }
 
 function addButtonToDropDown(button)
 {
-    $('#button-dropdown').append(`<option id="${button.id}" value="${button.name}">${button.name}</option>`);
+    $('#button-dropdown').append(`<option id="${button.id}" value="${button.id}">${button.name}</option>`);
+    selectButton(button);
+}
+
+// Function to find a button by its ID
+function findButtonById(id) {
+    return buttons.find(button => button.id == id);
 }
 
 function editButton() {
@@ -63,7 +91,7 @@ function editButton() {
     const buttonDropDown = $('#button-dropdown');
     const destroyButton = $('#destroy-button');
     const id = $('#button-dropdown option:selected').attr('id');
-    const selectedButton = buttons[id];
+    const selectedButton = findButtonById(id);
 
     if (!selectedButton) {
         // Handle case when no matching button is found
@@ -83,6 +111,10 @@ function editButton() {
         createButton.show();
         buttonDropDown.show();
         
+        removeOnInputChange('.edit');
+
+        updateButtons();
+        selectButton();
     // Edit button was pressed, toggle to save mode
     } else {
         populateFields(selectedButton);
@@ -94,17 +126,39 @@ function editButton() {
         destroyButton.hide();
         createButton.hide();
         buttonDropDown.hide();
+        
+        addOnInputChange('.edit', function() {
+            setButtonVal(selectedButton); 
+            updateButtons();
+        })
     }
 }
+
+function selectButton(buttonData = undefined) {
+    if (buttonData) 
+        $('#button-dropdown option[id="' + buttonData.id + '"]').prop('selected', true);            
+    
+    const id = $('#button-dropdown option:selected').attr('id');
+
+    if (selectedButton) selectedButton.removeClass('highlight');
+    
+    $('.custom-button').each(function() {
+        var buttonId = $(this).data('buttonData').id;
+
+        if (buttonId == id) 
+            selectedButton = $(this)
+      });
+    
+    if (selectedButton) selectedButton.addClass('highlight');
+}
+
   
 function setButtonVal(button)
 {
-    button.id = buttons.length;
     button.name = $('#button-name').val();
+    button.text = $('#button-text').val();
     button.width = parseInt($('#button-width').val());
     button.height = parseInt($('#button-height').val());
-    button.posX = parseInt($('#button-posx').val());
-    button.posY = parseInt($('#button-posy').val());
     button.borderStyle = $('#button-border-style').val();
     button.borderRadius = $('#button-border-radius').val();
     button.borderWidth = $('#button-border-width').val();
@@ -114,17 +168,15 @@ function setButtonVal(button)
     button.backgroundColor = $('#button-background-color').val();
     button.url = $('#button-url').val();
     button.method = $('#button-method').val();
-    button.data = $('#button-data').val();
-    button.function = $('#button-function').val();
+    button.css = '{' + $('#button-css').val() + '}';
 }
 
 function populateFields(button)
 {
     $('#button-name').val(button.name);
+    $('#button-text').val(button.text);
     $('#button-width').val(button.width);
     $('#button-height').val(button.height);
-    $('#button-posx').val(button.posX);
-    $('#button-posy').val(button.posY);
     $('#button-border-style').val(button.borderStyle),
     $('#button-border-radius').val(button.borderRadius),
     $('#button-border-width').val(button.borderWidth),
@@ -134,18 +186,7 @@ function populateFields(button)
     $('#button-background-color').val(button.backgroundColor),
     $('#button-url').val(button.url);
     $('#button-method').val(button.method);
-    $('#button-data').val(button.data);
-    $('#button-function').val(button.function);
-}
-
-// Gets rid of the currently selected button
-function destroyButton() {
-    var name = $('#button-dropdown option:selected').attr('value');
-
-    buttons = buttons.filter(button => button.name !== name);
-
-    // Remove the currently selected option from the dropdown
-    $('#button-dropdown option:selected').remove();
+    $('#button-css').val(button.css.slice(1, -1));
 }
 
 // Call this at the start so we can load what is currently loaded by the broadcaster
@@ -159,31 +200,29 @@ function loadButtons() {
             var config = JSON.parse(twitch.configuration.broadcaster.content)
             if(typeof config === "object"){
                 loadButtonsArray(config);
-                updateButtons();
             } else {
                 console.log('invalid config')
             }
         } catch(e) {
             console.log('invalid config')
-        }   
-
-        // Update the dropdown options
-        buttons.forEach((button) => {
-            addButtonToDropDown(button);
-        });
+        }
     }
 }
 
+// if we are loading in an existing configuration
 function loadButtonsArray(arr)
 {
     buttons = arr;
+    updateButtons();
 
-    // assign the id's for later use
-    for (let i = 0; i < buttons.length; i++)
-        buttons[i].id = i;
+    // Update the dropdown options
+    buttons.forEach((button) => {
+        addButtonToDropDown(button);
+    });
 }
 
 function updateConfig(){
+    updateButtons();
     console.log('in set')
     console.log(buttons)
     console.log(typeof buttons)
@@ -193,23 +232,16 @@ function updateConfig(){
     console.log(twitch.configuration.broadcaster.content)
 }
 
-twitch.onError(function(error) {
-    console.log(error);
-})
-
 function validateForm() {
     const name = $('#button-name');
     const width = $('#button-width');
     const height = $('#button-height');
-    const posX = $('#button-posx');
-    const posY = $('#button-posy');
     const borderRadius = $('#button-border-radius');
     const borderWidth = $('#button-border-width');
     const font = $('#button-font');
     const fontSize = $('#button-font-size');
     const url = $('#button-url');
-    const data = $('#button-data');
-    const func = $('#button-function');
+    const css = $('#button-css');
 
     // Remove the previous error highlighting
     $('.error-field').removeClass('error-field');
@@ -234,19 +266,6 @@ function validateForm() {
         height.after('<span class="error-message">Please enter a number greater than 0.</span>');
         isValid = false;
     }
-
-    if (isNaN(parseInt(posX.val())) || parseInt(height.val()) <= 0) {
-        posX.addClass('error-field');
-        posX.after('<span class="error-message">Please enter a number greater than 0.</span>');
-        isValid = false;
-    }
-
-    if (isNaN(parseInt(posY.val())) || parseInt(height.val()) <= 0) {
-        posY.addClass('error-field');
-        posY.after('<span class="error-message">Please enter a number greater than 0.</span>');
-        isValid = false;
-    }
-
     
     if (isNaN(parseInt(borderRadius.val())) || parseInt(borderRadius.val()) <= 0)
     {
@@ -282,33 +301,16 @@ function validateForm() {
         isValid = false;
     }
 
-    if (!isValidObjectLiteral(data.val()))
+    if (!isValidJson(css.val()))
     {
-        data.addClass('error-field');
-        data.after('<span class="error-message">Please enter a valid Javascript object literal.</span>');
-        isValid = false;
-    }
-
-    if (!validateJavaScriptCode(func.val()))
-    {
-        func.addClass('error-field');
-        func.after('<span class="error-message">Please enter valid Javascript code.</span>');
+        css.addClass('error-field');
+        css.after('<span class="error-message">Please enter all CSS attributes as separated by commas, with a colon between the attribute and value.</span>');
         isValid = false;
     }
     
     return isValid;
 }
 
-function validateJavaScriptCode(code) {
-    try {console.log("");
-        // Wrapping the code in a function to avoid potential global scope issues
-        new Function(code);
-        return true; // The code is valid
-    } catch (error) {
-        return false; // The code is invalid
-    }
-}
-  
 function isValidObjectLiteral(str) {
     // Define the regular expression pattern to match object literal syntax
     const objectLiteralPattern = /^\s*\{[\s\S]*\}\s*$/;
@@ -317,21 +319,117 @@ function isValidObjectLiteral(str) {
     return objectLiteralPattern.test(str);
 }
 
+function isValidJson(input) {
+    const jsonString = `{${input}}`;
+
+    try {
+        JSON.parse(jsonString);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
 $(document).ready(function() {
+    
     // Add event listeners to the input fields to trigger validation on change
-    $('#button-name').on('input', validateForm);
-    $('#button-width').on('input', validateForm);
-    $('#button-height').on('input', validateForm);
-    $('#button-posx').on('input', validateForm);
-    $('#button-posy').on('input', validateForm);
-    $('#button-border-radius').on('input', validateForm);
-    $('#button-border-width').on('input', validateForm);
-    $('#button-font').on('input', validateForm);
-    $('#button-font-size').on('input', validateForm);
-    $('#button-url').on('input', validateForm);
-    $('#button-data').on('input', validateForm);
-    $('#button-function').on('input', validateForm);
+    addOnInputChange('.validation', function() { validateForm() });
 
     validateForm();
 });
 
+function addOnInputChange(namespace = '', callback) {
+    $('#button-name').on(('input' + namespace), callback);
+    $('#button-text').on(('input' + namespace), callback);
+    $('#button-width').on(('input' + namespace), callback);
+    $('#button-height').on(('input' + namespace), callback);
+    $('#button-border-style').on(('input' + namespace), callback);
+    $('#button-border-radius').on(('input' + namespace), callback);
+    $('#button-border-width').on(('input' + namespace), callback);
+    $('#button-font').on(('input' + namespace), callback);
+    $('#button-font-size').on(('input' + namespace), callback);
+    $('#button-url').on(('input' + namespace), callback);
+    $('#button-css').on(('input' + namespace), callback);
+    $('#button-color').on(('input' + namespace), callback);
+    $('#button-background-color').on(('input' + namespace), callback);
+}
+
+function removeOnInputChange(namespace = '') {
+    $('#button-name').off('input' + namespace);
+    $('#button-text').off('input' + namespace);
+    $('#button-width').off('input' + namespace);
+    $('#button-height').off('input' + namespace);
+    $('#button-border-style').off('input' + namespace);
+    $('#button-border-radius').off('input' + namespace);
+    $('#button-border-width').off('input' + namespace);
+    $('#button-font').off('input' + namespace);
+    $('#button-font-size').off('input' + namespace);
+    $('#button-url').off('input' + namespace);
+    $('#button-css').off('input' + namespace);
+    $('#button-color').off('input' + namespace);
+    $('#button-background-color').off('input' + namespace);
+}
+
+function downloadButtons() {
+    // Convert the buttons array to JSON string
+    const jsonButtons = JSON.stringify(buttons);
+    
+    // Create a download link
+    const link = document.createElement('a');
+    link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(jsonButtons);
+    link.download = 'buttons.json';
+    
+    // Trigger the download
+    link.click();
+}
+
+function uploadButtons(files) {
+    if (files.length === 0) {
+        console.log('No file selected.');
+        return;
+    }
+
+    const file = files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const content = e.target.result;
+            
+            // Parse the uploaded JSON file
+            const uploadedButtons = JSON.parse(content);
+
+            // Validate if the uploaded content is an array
+            if (Array.isArray(uploadedButtons)) {
+                loadButtonsArray(uploadedButtons);
+                console.log('Buttons uploaded successfully.');
+            } else {
+                console.log('Invalid button data. Please upload a valid JSON file containing an array of buttons.');
+            }
+        } catch (error) {
+            console.log('Error while parsing the uploaded file.', error);
+        }
+    };
+
+    // Read the uploaded file as text
+    reader.readAsText(file);
+}
+
+function uploadPicture() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.onchange = function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function() {
+            const draggableArea = document.getElementById('draggable-area');
+            draggableArea.style.backgroundImage = `url(${reader.result})`;
+            draggableArea.style.backgroundSize = '100% 100%';
+            draggableArea.style.backgroundPosition = 'center';
+            draggableArea.style.backgroundRepeat = 'no-repeat';
+        };
+        reader.readAsDataURL(file);
+    };
+    fileInput.click();
+}
