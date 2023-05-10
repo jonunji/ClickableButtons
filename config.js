@@ -245,7 +245,16 @@ function updateConfig() {
     twitch.configuration.set("broadcaster", "1", JSON.stringify(buttons))
 
     // live refresh the screen
-    sendPubSubConfig(); 
+    sendPubSubConfig();
+
+    // Display success message
+    var successMessage = $("#submit");
+    successMessage.val("Successfully submitted");
+
+    // Hide the success message after 5 seconds
+    setTimeout(function() {
+      successMessage.val("Submit");
+    }, 5000);
 }
 
 // The POST request to support live config

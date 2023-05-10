@@ -62,6 +62,14 @@ body {
   grid-column: 2;
 }
 
+#submit-container {
+  padding-top: 10px;
+}
+
+#submit {
+  width: 970px;
+}
+
 /* Glowing effect */
 .highlight {
   box-shadow: 0 0 10px #ffcc00;
