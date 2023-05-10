@@ -56,6 +56,7 @@ twitch.listen('broadcast', function (target, contentType, message) {
     update(message.data);
 });
 
+// modifies the current buttons' fields with the given data
 function update(data)
 {
     try {
