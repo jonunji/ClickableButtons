@@ -248,6 +248,7 @@ function updateConfig() {
     sendPubSubConfig(); 
 }
 
+// The POST request to support live config
 function sendPubSubConfig() {
     $.post({
         url: 'http://localhost:8080/updateconfig',
