@@ -14,14 +14,29 @@ app.post('/updateconfig', (req, res) => {
     // Retrieve data from the request
     const buttons = req.body.buttons;
     const channelId = req.body.channelId;
-    console.log(buttons)
-    console.log(channelId)
 
     // Call the sendPubSubConfig() function with the received data
     sendPubSubConfig(buttons, channelId);
 
     // Respond with a success message
     res.status(200).send('PubSub config sent successfully');
+});
+
+app.post('/postbutton', (req, res) => {
+
+    const data = req.body;
+    data.text = "PRESSED FROM POST"
+    
+    // Respond with a success message
+    res.status(200).send(data);
+});
+
+app.get('/getbutton', (req, res) => {
+    const data = req.query;
+    data.text = "PRESSED FROM GET";
+
+    // Respond with a success message
+    res.status(200).send(data);
 });
 
 app.get('/:filepath(*)', (req, res) => {

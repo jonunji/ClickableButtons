@@ -258,7 +258,7 @@ function updateConfig() {
 // The POST request to support live config
 function sendPubSubConfig() {
     $.post({
-        url: 'http://localhost:8080/updateconfig',
+        url: 'https://clickablebuttons.onrender.com/updateconfig',
         method: 'POST',
         data: JSON.stringify({ buttons, channelId }),
         contentType: "application/json; charset=utf-8",
@@ -344,7 +344,7 @@ function validateForm() {
     if (!isValidJson(css.val()))
     {
         css.addClass('error-field');
-        css.after('<span class="error-message">Please enter all CSS attributes as separated by commas, with a colon between the attribute and value.</span>');
+        css.after('<span class="error-message">Please enter all CSS attributes surrounded by quotes, separated by commas, with a colon between the attribute and value. (Ex. "color" : "blue", "width" : "10px")</span>');
         isValid = false;
     }
     

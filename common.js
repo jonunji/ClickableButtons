@@ -75,11 +75,21 @@ function updateButtons(configMode = true) {
         $button.on('click', function(event) {
             event.stopPropagation(); // Prevent clicking the draggable area
 
+            const info = {}
+            if (buttonData.method == "POST") {
+                info.data = JSON.stringify(buttonData);
+                info.contentType = "application/json; charset=utf-8";
+            } else 
+                info.data = buttonData;
+                
+            console.log("INFO: ",info);
+
             // Make the HTTP request based on the button attributes
             $.ajax({
                 url: buttonData.url,
                 method: buttonData.method,
-                data: buttonData,
+                data: info.data,
+                contentType: info.contentType,
                 success: function(response) {
                     if (typeof response === 'object') {
                         // set the values to what was provided
