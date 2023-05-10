@@ -2,11 +2,13 @@ var buttons = [];
 
 function updateButtons(configMode = true) {
     // empty the container with the buttons
-    if (configMode)
+    if (configMode) {
         $('#draggable-area').empty();
-    else
+        $("#download-textarea").val(JSON.stringify(buttons));
+    } else {
 	    $('#button-container').empty();
-
+    }
+    
     buttons.forEach(function(buttonData) {
         buttonData["userId"] = userId;
 

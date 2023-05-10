@@ -240,8 +240,6 @@ function updateConfig() {
     // refresh the screen
     updateButtons();
 
-    $("#download-textarea").val(JSON.stringify(buttons));
-
     twitch.configuration.set("broadcaster", "1", JSON.stringify(buttons))
 
     // live refresh the screen
@@ -371,6 +369,16 @@ $(document).ready(function() {
 
     // initial call to check the form
     validateForm();
+
+    $('#create-button').on('click', createButton);
+    $('#button-dropdown').on('change', selectButton);
+    $('#edit-button').on('click', editButton);
+    $('#destroy-button').on('click', destroyButton);
+    $('#draggable-area').on('click', uploadPicture);
+    $('#submit').on('click', updateConfig);
+    $('#upload-file').on('change', function() {
+        uploadButtons(this.files);
+    });
 });
 
 // Adds listeners to input in the provided namespace to the provided callback

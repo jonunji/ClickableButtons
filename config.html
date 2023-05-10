@@ -19,7 +19,7 @@
   </div>
   <div id="upload">
       <label for="upload-file">Upload Buttons:</label>
-      <input type="file" id="upload-file" onchange="uploadButtons(this.files)">
+      <input type="file" id="upload-file">
   </div>
   
   <form id="config-form">
@@ -84,24 +84,24 @@
       
     </form>
     <div id="button-options">
-      <button type="button" id="create-button" onclick="createButton()">Create Button</button>
+      <button type="button" id="create-button">Create Button</button>
       
-      <select id="button-dropdown" onchange="selectButton()">
+      <select id="button-dropdown">
         <option value=""></option>
       </select>
   
-      <button type="button" id="edit-button" onclick="editButton()">Edit Button</button>
-      <button type="button" id="destroy-button" onclick="destroyButton()">Delete Button</button>
+      <button type="button" id="edit-button">Edit Button</button>
+      <button type="button" id="destroy-button">Delete Button</button>
     </div>
     <div id="button-id-container">
       <h3>Use each button's unique ID to make requests, such as modifying buttons.</h2>
       <h3 id="button-id">Button ID: </h3>
     </div>
     <label for="draggable-area">Click in the box to upload an image (should be 16:9 as per Twitch video aspect ratio)</label>
-    <div id="draggable-area" onclick="uploadPicture()">
+    <div id="draggable-area">
     </div>
   <div id="submit-container">
-    <input id="submit" type="submit" value="Submit" onclick="updateConfig()">
+    <input id="submit" type="submit" value="Submit">
   </div>
 </body>
 </html>
