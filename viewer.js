@@ -46,9 +46,6 @@ function findButtonById(id) {
 
 // listen for incoming broadcast message from our EBS
 twitch.listen('broadcast', function (target, contentType, message) {
-    console.log(target)
-    console.log(contentType)
-    console.log(message)
     try {
         message = JSON.parse(message);
     } catch (e) {
@@ -56,10 +53,10 @@ twitch.listen('broadcast', function (target, contentType, message) {
         return;
     }
 
-    pubSubUpdate(message.data);
+    update(message.data);
 });
 
-function pubSubUpdate(data)
+function update(data)
 {
     try {
         data = JSON.parse(data);
@@ -83,9 +80,4 @@ function pubSubUpdate(data)
 
     // actually make the change visible
     updateButtons(false);
-}
-
-function pubSubConfig() 
-{
-    
 }
