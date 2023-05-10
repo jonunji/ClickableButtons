@@ -1,3 +1,4 @@
+// This is the width of the draggable area in config.html
 var targetWidth = 960;
 
 $(document).ready(function() {

@@ -24,31 +24,6 @@ app.post('/updateconfig', (req, res) => {
     res.status(200).send('PubSub config sent successfully');
 });
 
-// Define a route for button 1
-app.get('/button1', (req, res) => {
-    // Handle button 1 logic here
-    const id = req.query.id;
-    console.log("Button 1 was clicked! with id: " + id);
-    res.status(200).send(req.query);
-});
-
-// Define a route for button 2
-app.get('/button2', (req, res) => {
-    data = req.query;
-    // Handle button 2 logic here
-    const id = data.id;
-    console.log("Button 2 was clicked! with id: " + id);
-
-    sendPubSubConfig([], '92181806');
-
-    res.status(200).send(data);
-});
-
-app.get('/', (req, res) => {
-    // Handle root URL logic here
-    res.send('Welcome to the homepage!');
-});
-
 app.get('/:filepath(*)', (req, res) => {
   const filepath = req.params.filepath;
   const requestedFile = path.join(__dirname, filepath);
