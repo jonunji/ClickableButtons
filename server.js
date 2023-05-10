@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 app.use(cors()); // Enable CORS
 
@@ -16,13 +19,11 @@ app.get('/button1', (req, res) => {
 // Define a route for button 2
 app.get('/button2', (req, res) => {
     data = req.query;
-    console.log("The req is ", req.query)
     // Handle button 2 logic here
     const id = data.id;
-    data.text = "33333";
-    data.fontSize = 300;
-    console.log("The string data is ", data);
     console.log("Button 2 was clicked! with id: " + id);
+
+    sendPubSubUpdate();
 
     res.status(200).send(data);
 });
@@ -50,3 +51,66 @@ app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
+// Load configuation
+const config = JSON.parse(fs.readFileSync(path.join(
+    __dirname,
+    'config.json'
+)));
+
+// Prepare the Extension secret for use
+// it's base64 encoded and we need to decode it first
+const ext_secret = Buffer.from(config.extension_secret, 'base64');
+const channelId = "92181806";
+
+const sigPubSubPayload = {
+    "exp": Math.floor(new Date().getTime() / 1000) + 10,
+    "user_id": config.owner,
+    "role": "external",
+    "channel_id": channelId,
+    "pubsub_perms": {
+        "send": [
+            "broadcast"
+        ]
+    }
+}
+const sigPubSub = jwt.sign(sigPubSubPayload, ext_secret);
+var content = JSON.stringify([
+    {
+        id: '1683651672490',
+        text: 'I CHANGED IT!'
+    }
+]);
+
+function sendPubSubUpdate() {
+    fetch(
+        "https://api.twitch.tv/helix/extensions/pubsub",
+        {
+            method: "POST",
+            headers: {
+                "Client-ID": config.client_id,
+                "Authorization": `Bearer ${sigPubSub}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                target: sigPubSubPayload.pubsub_perms.send,
+                broadcaster_id: channelId,
+                is_global_broadcast: false,
+                message: JSON.stringify({
+                    event: "update",
+                    data: content
+                })
+            })
+        }
+    )
+    .then(async resp => {
+        // Same story here with the rate limit its around 60 per minute per topic
+        if (resp.status != 204) {
+            console.error('Relay Error', await resp.text());
+            return;
+        }
+        console.error('Relay PubSub OK', resp.status, resp.headers.get('ratelimit-remaining'), '/', resp.headers.get('ratelimit-limit'), resp);
+    })
+    .catch(err => {
+        console.error('Relay Error', err);
+    });
+}

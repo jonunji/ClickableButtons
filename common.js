@@ -1,20 +1,22 @@
+var buttons = [];
+
 function updateButtons(configMode = true) {
     // empty the container with the buttons
     if (configMode)
         $('#draggable-area').empty();
     else
 	    $('#button-container').empty();
-    
+
     buttons.forEach(function(buttonData) {
         buttonData["userId"] = userId;
+
+        console.log(buttonData);
         
         // Create the button element
         const $button = $('<button>').text(buttonData.text);
         $button.data('buttonData', buttonData);
         $button.addClass('custom-button');
         $button.addClass('resizable-button');
-
-        updateData();
         
         function updateData() {
             $button.css({
@@ -42,10 +44,13 @@ function updateButtons(configMode = true) {
 
             // set the text
             $button.text(buttonData.text);
+
+            // make sure the buttons stay in the same spot regardless of video size
+            if (!configMode) resizeButtons();
         }
 
-        if (configMode)
-        {       
+        // draggable when in the configuration
+        if (configMode) {       
             $($button).draggable({
                 cancel:false,
                 containment: 'parent',
@@ -66,7 +71,7 @@ function updateButtons(configMode = true) {
 
         // Add an event listener to the button
         $button.on('click', function(event) {
-            event.stopPropagation(); // Prevent event propagation to parent elements
+            event.stopPropagation(); // Prevent clicking the draggable area
 
             // Make the HTTP request based on the button attributes
             $.ajax({
@@ -74,8 +79,7 @@ function updateButtons(configMode = true) {
                 method: buttonData.method,
                 data: buttonData,
                 success: function(response) {
-                    if (typeof response === 'object')
-                    {
+                    if (typeof response === 'object') {
                         // set the values to what was provided
                         $.each(response, function(property, value) {
                             buttonData[property] = value;
@@ -83,14 +87,10 @@ function updateButtons(configMode = true) {
     
                         // actually change the button
                         updateData();
-                        
-                        if (!configMode)
-                            resizeButtons();
                     }
                 },
                 error: function(error) {
-                    console.error("Error:", error);
-                    // Handle error response
+                    console.error("Error when clicking button:", error);
                 }
             });
 
@@ -103,5 +103,7 @@ function updateButtons(configMode = true) {
             $('#draggable-area').append($button);
         else
             $('#button-container').append($button);
+
+        updateData();
     })
 }

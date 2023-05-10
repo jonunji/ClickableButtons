@@ -1,13 +1,8 @@
 var token, userId;
-var buttons = [], selectedButton;
+var selectedButton;
 
 // so we don't have to write this out everytime 
 const twitch = window.Twitch.ext;
-
-// onContext callback called when context of an extension is fired 
-twitch.onContext((context) => {
-    //console.log(context);
-});
 
 // onAuthorized callback called each time JWT is fired
 twitch.onAuthorized((auth) => {
@@ -22,37 +17,38 @@ twitch.onAuthorized((auth) => {
 
 
 // when the config changes, save the new changes! 
-twitch.configuration.onChanged(function(){
+twitch.configuration.onChanged(function() {
     console.log(twitch.configuration.broadcaster)
-    console.log("in onChanged")
 
-    if(twitch.configuration.broadcaster){
+    if (twitch.configuration.broadcaster) {
         console.log("config exists")
-    try {
-        var config = JSON.parse(twitch.configuration.broadcaster.content)
-        if(typeof config === "object"){
-            buttons = config
-            updateButtons()
-        } else {
+        try {
+            var config = JSON.parse(twitch.configuration.broadcaster.content)
+            if (typeof config === "object") {
+                buttons = config
+                updateButtons()
+            } else {
+                console.log('invalid config')
+            }
+        } catch(e) {
             console.log('invalid config')
         }
-    } catch(e) {
-        console.log('invalid config')
-    }
     }
 })
 
+// makes the button data and adds it to the screen and dropdown
 function createButton() {
 
+    // don't make a button if the fields are invalid
     if (!validateForm()) return;
 
-    // Get the values from the form inputs
     var button = {};
     button.id = new Date().getTime();
 
     setButtonVal(button);
     buttons.push(button);
 
+    // refresh the screen
     updateButtons();
 
     addButtonToDropDown(button);
@@ -74,8 +70,8 @@ function destroyButton() {
     selectButton();
 }
 
-function addButtonToDropDown(button)
-{
+// Given button data, add it to the dropdown
+function addButtonToDropDown(button) {
     $('#button-dropdown').append(`<option id="${button.id}" value="${button.id}">${button.name}</option>`);
     selectButton(button);
 }
@@ -85,6 +81,7 @@ function findButtonById(id) {
     return buttons.find(button => button.id == id);
 }
 
+// Makes the currently selected button modifiable
 function editButton() {
     const editButton = $('#edit-button');
     const createButton = $('#create-button');
@@ -111,10 +108,12 @@ function editButton() {
         createButton.show();
         buttonDropDown.show();
         
+        // Remove live view of editing the button's properties
         removeOnInputChange('.edit');
 
         updateButtons();
         selectButton();
+
     // Edit button was pressed, toggle to save mode
     } else {
         populateFields(selectedButton);
@@ -127,6 +126,7 @@ function editButton() {
         createButton.hide();
         buttonDropDown.hide();
         
+        // Add live view of editing the button's properties
         addOnInputChange('.edit', function() {
             setButtonVal(selectedButton); 
             updateButtons();
@@ -134,27 +134,38 @@ function editButton() {
     }
 }
 
+// Sets the given button as selected, or uses the dropdown to select the button
 function selectButton(buttonData = undefined) {
     if (buttonData) 
         $('#button-dropdown option[id="' + buttonData.id + '"]').prop('selected', true);            
     
     const id = $('#button-dropdown option:selected').attr('id');
 
-    if (selectedButton) selectedButton.removeClass('highlight');
+    if (selectedButton)
+    {
+        selectedButton.removeClass('highlight');
+        $('#button-id').text("Button ID: ")
+    } 
     
     $('.custom-button').each(function() {
         var buttonId = $(this).data('buttonData').id;
 
         if (buttonId == id) 
             selectedButton = $(this)
-      });
+    });
     
-    if (selectedButton) selectedButton.addClass('highlight');
-}
+    if (selectedButton) 
+    {
+        selectedButton.addClass('highlight');
+        var buttonId = $("<u>").text(selectedButton.data('buttonData').id);
+        buttonId.css('color', 'red');
 
+        $('#button-id').html("Button ID: ").append(buttonId);
+    }
+}
   
-function setButtonVal(button)
-{
+// Sets the properties of a given button's data to the fields in config.html
+function setButtonVal(button) {
     button.name = $('#button-name').val();
     button.text = $('#button-text').val();
     button.width = parseInt($('#button-width').val());
@@ -171,8 +182,8 @@ function setButtonVal(button)
     button.css = '{' + $('#button-css').val() + '}';
 }
 
-function populateFields(button)
-{
+// Sets the fields in config.html to the provided button's properties
+function populateFields(button) {
     $('#button-name').val(button.name);
     $('#button-text').val(button.text);
     $('#button-width').val(button.width);
@@ -199,6 +210,8 @@ function loadButtons() {
         try {
             var config = JSON.parse(twitch.configuration.broadcaster.content)
             if(typeof config === "object"){
+                console.log(config)
+                buttons = config;
                 loadButtonsArray(config);
             } else {
                 console.log('invalid config')
@@ -221,17 +234,18 @@ function loadButtonsArray(arr)
     });
 }
 
-function updateConfig(){
+// Called when submitting the config form
+function updateConfig() {
+    // refresh the screen
     updateButtons();
-    console.log('in set')
-    console.log(buttons)
-    console.log(typeof buttons)
-    console.log(JSON.stringify(buttons))
+
     twitch.configuration.set("broadcaster", "1", JSON.stringify(buttons))
-    console.log("has it been set?")
-    console.log(twitch.configuration.broadcaster.content)
+
+    // live refresh the screen
+    sendPubSubConfig(buttons, token.channelId); 
 }
 
+// checks that all fields are valid
 function validateForm() {
     const name = $('#button-name');
     const width = $('#button-width');
@@ -311,14 +325,6 @@ function validateForm() {
     return isValid;
 }
 
-function isValidObjectLiteral(str) {
-    // Define the regular expression pattern to match object literal syntax
-    const objectLiteralPattern = /^\s*\{[\s\S]*\}\s*$/;
-
-    // Test if the string matches the object literal pattern
-    return objectLiteralPattern.test(str);
-}
-
 function isValidJson(input) {
     const jsonString = `{${input}}`;
 
@@ -335,9 +341,11 @@ $(document).ready(function() {
     // Add event listeners to the input fields to trigger validation on change
     addOnInputChange('.validation', function() { validateForm() });
 
+    // initial call to check the form
     validateForm();
 });
 
+// Adds listeners to input in the provided namespace to the provided callback
 function addOnInputChange(namespace = '', callback) {
     $('#button-name').on(('input' + namespace), callback);
     $('#button-text').on(('input' + namespace), callback);
@@ -354,6 +362,7 @@ function addOnInputChange(namespace = '', callback) {
     $('#button-background-color').on(('input' + namespace), callback);
 }
 
+// Removes listeners to input of the provided namespace
 function removeOnInputChange(namespace = '') {
     $('#button-name').off('input' + namespace);
     $('#button-text').off('input' + namespace);
@@ -370,6 +379,7 @@ function removeOnInputChange(namespace = '') {
     $('#button-background-color').off('input' + namespace);
 }
 
+// CHANGE THIS TO JUST BE A TEXT BOX SINCE WE CANT DOWNLOAD >:(
 function downloadButtons() {
     // Convert the buttons array to JSON string
     const jsonButtons = JSON.stringify(buttons);
@@ -383,6 +393,7 @@ function downloadButtons() {
     link.click();
 }
 
+// Allows for uploading a config in case someone else made one you like
 function uploadButtons(files) {
     if (files.length === 0) {
         console.log('No file selected.');
@@ -415,10 +426,12 @@ function uploadButtons(files) {
     reader.readAsText(file);
 }
 
+// Allows for uploading picture to the draggable area
 function uploadPicture() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
+
     fileInput.onchange = function(event) {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -431,5 +444,8 @@ function uploadPicture() {
         };
         reader.readAsDataURL(file);
     };
+
     fileInput.click();
 }
+
+

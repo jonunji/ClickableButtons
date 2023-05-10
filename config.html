@@ -69,7 +69,7 @@
       <input type="color" id="button-background-color" name="button-background-color" value="#000000"><br>
       
       <label for="button-url">Button URL:</label>
-      <input type="text" id="button-url" name="button-url" value="http://localhost:8080/button1"><br>
+      <input type="text" id="button-url" name="button-url" value="http://localhost:8080/"><br>
   
       <label for="button-method">Button Method:</label>
       <select id="button-method" name="button-method">
@@ -79,7 +79,6 @@
   
       <label for="button-css">Button Additional CSS:</label>
       <textarea id="button-css" name="button-css"></textarea><br>
-      
       
     </form>
     <div id="button-options">
@@ -91,6 +90,10 @@
   
       <button type="button" id="edit-button" onclick="editButton()">Edit Button</button>
       <button type="button" id="destroy-button" onclick="destroyButton()">Delete Button</button>
+    </div>
+    <div id="button-id-container">
+      <h3>Use each button's unique ID to make requests, such as modifying buttons.</h2>
+      <h3 id="button-id">Button ID: </h3>
     </div>
     <label for="draggable-area">Click in the box to upload an image (should be 16:9 as per Twitch video aspect ratio)</label>
     <div id="draggable-area" onclick="uploadPicture()">
