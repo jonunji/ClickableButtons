@@ -1,4 +1,4 @@
-var token, userId;
+var token, userId, channelId;
 var selectedButton;
 
 // so we don't have to write this out everytime 
@@ -9,6 +9,7 @@ twitch.onAuthorized((auth) => {
     // save our credentials
     token = auth.token; //JWT passed to backend for authentication 
     userId = auth.userId; //opaque userID 
+    channelId = auth.channelId;
     
     console.log("Authorized!")
 
@@ -239,10 +240,27 @@ function updateConfig() {
     // refresh the screen
     updateButtons();
 
+    $("#download-textarea").val(JSON.stringify(buttons));
+
     twitch.configuration.set("broadcaster", "1", JSON.stringify(buttons))
 
     // live refresh the screen
-    sendPubSubConfig(buttons, token.channelId); 
+    sendPubSubConfig(); 
+}
+
+function sendPubSubConfig() {
+    $.post({
+        url: 'http://localhost:8080/updateconfig',
+        method: 'POST',
+        data: JSON.stringify({ buttons, channelId }),
+        contentType: "application/json; charset=utf-8",
+        success: function(response) {
+            console.log("Success: ", response);
+        },
+        error: function(error) {
+            console.error("Error when clicking button:", error);
+        }
+    });
 }
 
 // checks that all fields are valid
@@ -377,20 +395,6 @@ function removeOnInputChange(namespace = '') {
     $('#button-css').off('input' + namespace);
     $('#button-color').off('input' + namespace);
     $('#button-background-color').off('input' + namespace);
-}
-
-// CHANGE THIS TO JUST BE A TEXT BOX SINCE WE CANT DOWNLOAD >:(
-function downloadButtons() {
-    // Convert the buttons array to JSON string
-    const jsonButtons = JSON.stringify(buttons);
-    
-    // Create a download link
-    const link = document.createElement('a');
-    link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(jsonButtons);
-    link.download = 'buttons.json';
-    
-    // Trigger the download
-    link.click();
 }
 
 // Allows for uploading a config in case someone else made one you like

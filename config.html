@@ -12,12 +12,14 @@
 </head>
 <body>
   <h1>Button Configuration</h1>
-  <div id="upload-download">
+  <div id="download">
     <!-- add two buttons here, one to downloadButtons, and one to uploadButtons -->
-    <button type="button" onclick="downloadButtons()">Download Buttons</button>
-    
-    <label for="upload-file">Upload Buttons:</label>
-    <input type="file" id="upload-file" onchange="uploadButtons(this.files)">
+    <h3>Copy this and place it in a *.json file to be able to upload later.</h3>
+    <textarea id="download-textarea" readonly></textarea>
+  </div>
+  <div id="upload">
+      <label for="upload-file">Upload Buttons:</label>
+      <input type="file" id="upload-file" onchange="uploadButtons(this.files)">
   </div>
   
   <form id="config-form">

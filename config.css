@@ -15,11 +15,13 @@ body {
 #config-form {
   display: grid;
   grid-template-columns: max-content auto;
+  column-gap: 5px;
 }
 
 #config-form label {
   text-align: right;
   grid-column: 1;
+  font-weight: bold;
 }
 
 #config-form input,
@@ -35,7 +37,11 @@ body {
   padding-bottom: 10px;
 }
 
-#upload-download {
+#download{
+  padding-bottom: 30px;
+}
+
+#upload{
   padding-bottom: 30px;
 }
 

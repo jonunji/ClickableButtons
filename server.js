@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 const path = require('path');
 const cors = require('cors');
@@ -7,6 +8,21 @@ const fs = require('fs');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 app.use(cors()); // Enable CORS
+app.use(bodyParser.json())
+
+app.post('/updateconfig', (req, res) => {
+    // Retrieve data from the request
+    const buttons = req.body.buttons;
+    const channelId = req.body.channelId;
+    console.log(buttons)
+    console.log(channelId)
+
+    // Call the sendPubSubConfig() function with the received data
+    sendPubSubConfig(buttons, channelId);
+
+    // Respond with a success message
+    res.status(200).send('PubSub config sent successfully');
+});
 
 // Define a route for button 1
 app.get('/button1', (req, res) => {
@@ -23,7 +39,7 @@ app.get('/button2', (req, res) => {
     const id = data.id;
     console.log("Button 2 was clicked! with id: " + id);
 
-    sendPubSubUpdate();
+    sendPubSubConfig([], '92181806');
 
     res.status(200).send(data);
 });
@@ -45,43 +61,38 @@ app.get('/:filepath(*)', (req, res) => {
   });
 });
 
-
 const port = 8080;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-// Load configuation
-const config = JSON.parse(fs.readFileSync(path.join(
-    __dirname,
-    'config.json'
-)));
+function sendPubSubConfig(configData, channelId) {
+    console.log("received the call", configData, channelId);
+    // Load configuation
+    const config = JSON.parse(fs.readFileSync(path.join(
+        __dirname,
+        'config.json'
+    )));
 
-// Prepare the Extension secret for use
-// it's base64 encoded and we need to decode it first
-const ext_secret = Buffer.from(config.extension_secret, 'base64');
-const channelId = "92181806";
+    // Prepare the Extension secret for use
+    // it's base64 encoded and we need to decode it first
+    const ext_secret = Buffer.from(config.extension_secret, 'base64');
 
-const sigPubSubPayload = {
-    "exp": Math.floor(new Date().getTime() / 1000) + 10,
-    "user_id": config.owner,
-    "role": "external",
-    "channel_id": channelId,
-    "pubsub_perms": {
-        "send": [
-            "broadcast"
-        ]
+    const sigPubSubPayload = {
+        "exp": Math.floor(new Date().getTime() / 1000) + 5,
+        "user_id": config.owner,
+        "role": "external",
+        "channel_id": channelId,
+        "pubsub_perms": {
+            "send": [
+                "broadcast"
+            ]
+        }
     }
-}
-const sigPubSub = jwt.sign(sigPubSubPayload, ext_secret);
-var content = JSON.stringify([
-    {
-        id: '1683651672490',
-        text: 'I CHANGED IT!'
-    }
-]);
 
-function sendPubSubUpdate() {
+    var content = JSON.stringify(configData);
+    const sigPubSub = jwt.sign(sigPubSubPayload, ext_secret);
+    
     fetch(
         "https://api.twitch.tv/helix/extensions/pubsub",
         {
@@ -96,7 +107,7 @@ function sendPubSubUpdate() {
                 broadcaster_id: channelId,
                 is_global_broadcast: false,
                 message: JSON.stringify({
-                    event: "update",
+                    event: "config",
                     data: content
                 })
             })
@@ -108,7 +119,7 @@ function sendPubSubUpdate() {
             console.error('Relay Error', await resp.text());
             return;
         }
-        console.error('Relay PubSub OK', resp.status, resp.headers.get('ratelimit-remaining'), '/', resp.headers.get('ratelimit-limit'), resp);
+        console.error('Relay PubSub OK', resp.status, resp.headers.get('ratelimit-remaining'), '/', resp.headers.get('ratelimit-limit'));
     })
     .catch(err => {
         console.error('Relay Error', err);
