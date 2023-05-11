@@ -77,7 +77,7 @@ function updateButtons(configMode = true) {
             event.stopPropagation(); // Prevent clicking the draggable area
 
             // only use the buttons if the checkbox on config.html is selected
-            if ($("#click-check-box").is(':checked'))
+            if (!configMode || $("#click-check-box").is(':checked'))
             {
                 const info = {}
                 if (buttonData.method == "POST") {
