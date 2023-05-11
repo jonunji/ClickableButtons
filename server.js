@@ -22,10 +22,20 @@ app.post('/updateconfig', (req, res) => {
     res.status(200).send('PubSub config sent successfully');
 });
 
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 app.post('/postbutton', (req, res) => {
 
     const data = req.body;
     data.text = "PRESSED FROM POST"
+    data.backgroundColor = getRandomColor();
     
     // Respond with a success message
     res.status(200).send(data);
@@ -34,6 +44,8 @@ app.post('/postbutton', (req, res) => {
 app.get('/getbutton', (req, res) => {
     const data = req.query;
     data.text = "PRESSED FROM GET";
+
+    data.backgroundColor = getRandomColor();
 
     // Respond with a success message
     res.status(200).send(data);

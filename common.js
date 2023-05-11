@@ -70,41 +70,46 @@ function updateButtons(configMode = true) {
                 }
             })
         }
+        
 
         // Add an event listener to the button
         $button.on('click', function(event) {
             event.stopPropagation(); // Prevent clicking the draggable area
 
-            const info = {}
-            if (buttonData.method == "POST") {
-                info.data = JSON.stringify(buttonData);
-                info.contentType = "application/json; charset=utf-8";
-            } else 
-                info.data = buttonData;
-                
-            console.log("INFO: ",info);
-
-            // Make the HTTP request based on the button attributes
-            $.ajax({
-                url: buttonData.url,
-                method: buttonData.method,
-                data: info.data,
-                contentType: info.contentType,
-                success: function(response) {
-                    if (typeof response === 'object') {
-                        // set the values to what was provided
-                        $.each(response, function(property, value) {
-                            buttonData[property] = value;
-                        })
+            // only use the buttons if the checkbox on config.html is selected
+            if ($("#click-check-box").is(':checked'))
+            {
+                const info = {}
+                if (buttonData.method == "POST") {
+                    info.data = JSON.stringify(buttonData);
+                    info.contentType = "application/json; charset=utf-8";
+                } else 
+                    info.data = buttonData;
+                    
+                console.log("INFO: ",info);
     
-                        // actually change the button
-                        updateData();
+                // Make the HTTP request based on the button attributes
+                $.ajax({
+                    url: buttonData.url,
+                    method: buttonData.method,
+                    data: info.data,
+                    contentType: info.contentType,
+                    success: function(response) {
+                        if (typeof response === 'object') {
+                            // set the values to what was provided
+                            $.each(response, function(property, value) {
+                                buttonData[property] = value;
+                            })
+        
+                            // actually change the button
+                            updateData();
+                        }
+                    },
+                    error: function(error) {
+                        console.error("Error when clicking button:", error);
                     }
-                },
-                error: function(error) {
-                    console.error("Error when clicking button:", error);
-                }
-            });
+                });
+            }
 
             // only select when not editing a button
             if (configMode && !$('#edit-button').hasClass("edit-mode")) 
