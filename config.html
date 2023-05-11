@@ -71,8 +71,9 @@
       <input type="color" id="button-background-color" name="button-background-color" value="#000000"><br>
       
       <label for="button-url">Button URL:</label>
-      <input type="text" id="button-url" name="button-url" value="http://localhost:8080/"><br>
-  
+      <input type="text" id="button-url-prefix" value="http://localhost:" disabled>
+      <input type="text" id="button-url-endpoint" name="button-url-endpoint" placeholder="Port and Endpoint"><br>
+        
       <label for="button-method">Button Method:</label>
       <select id="button-method" name="button-method">
         <option value="GET">GET</option>

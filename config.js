@@ -178,7 +178,7 @@ function setButtonVal(button) {
     button.fontSize = $('#button-font-size').val();
     button.color = $('#button-color').val();
     button.backgroundColor = $('#button-background-color').val();
-    button.url = $('#button-url').val();
+    button.url = 'http://localhost:' + $('#button-url-endpoint').val();
     button.method = $('#button-method').val();
     button.css = '{' + $('#button-css').val() + '}';
 }
@@ -196,9 +196,11 @@ function populateFields(button) {
     $('#button-font-size').val(button.fontSize),
     $('#button-color').val(button.color),
     $('#button-background-color').val(button.backgroundColor),
-    $('#button-url').val(button.url);
+    $('#button-url-endpoint').val(button.url.replace('http://localhost:', ''));
     $('#button-method').val(button.method);
     $('#button-css').val(button.css.slice(1, -1));
+
+    validateForm();
 }
 
 // Call this at the start so we can load what is currently loaded by the broadcaster
@@ -280,7 +282,7 @@ function validateForm() {
     const borderWidth = $('#button-border-width');
     const font = $('#button-font');
     const fontSize = $('#button-font-size');
-    const url = $('#button-url');
+    const url = $('#button-url-endpoint');
     const css = $('#button-css');
 
     // Remove the previous error highlighting
@@ -334,10 +336,11 @@ function validateForm() {
         isValid = false;
     }
 
-    var urlPattern = /^(https?:\/\/)?([\w.-]+)(:\d{1,5})?(\/\S*)?$/i;
+    // test the endpoint field
+    var urlPattern = /^\d+\/[a-zA-Z0-9_/-]*$/;
     if (!urlPattern.test(url.val())) {
         url.addClass('error-field');
-        url.after('<span class="error-message">Please enter a valid url.</span>');
+        url.after('<span class="error-message">Please enter a valid port and endpoint. Format should be ####/{endpoint}</span>');
         isValid = false;
     }
 
@@ -367,9 +370,6 @@ $(document).ready(function() {
     // Add event listeners to the input fields to trigger validation on change
     addOnInputChange('.validation', function() { validateForm() });
 
-    // initial call to check the form
-    validateForm();
-
     $('#create-button').on('click', createButton);
     $('#button-dropdown').on('change', selectButton);
     $('#edit-button').on('click', editButton);
@@ -392,7 +392,7 @@ function addOnInputChange(namespace = '', callback) {
     $('#button-border-width').on(('input' + namespace), callback);
     $('#button-font').on(('input' + namespace), callback);
     $('#button-font-size').on(('input' + namespace), callback);
-    $('#button-url').on(('input' + namespace), callback);
+    $('#button-url-endpoint').on(('input' + namespace), callback);
     $('#button-css').on(('input' + namespace), callback);
     $('#button-color').on(('input' + namespace), callback);
     $('#button-background-color').on(('input' + namespace), callback);
@@ -409,7 +409,7 @@ function removeOnInputChange(namespace = '') {
     $('#button-border-width').off('input' + namespace);
     $('#button-font').off('input' + namespace);
     $('#button-font-size').off('input' + namespace);
-    $('#button-url').off('input' + namespace);
+    $('#button-url-endpoint').off('input' + namespace);
     $('#button-css').off('input' + namespace);
     $('#button-color').off('input' + namespace);
     $('#button-background-color').off('input' + namespace);
