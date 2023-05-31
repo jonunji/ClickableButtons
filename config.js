@@ -98,7 +98,7 @@ function editButton() {
     }
 
     // Save button was pressed
-    if (editButton.hasClass('edit-mode')) {
+    if (editButton.hasClass('edit-mode') && validateForm()) {
         setButtonVal(selectedButton);
 
         // Remove edit mode class and update button text
