@@ -57,12 +57,11 @@ You can click the blue area where the buttons go to add an image. This is helpfu
 Buttons can be positioned by dragging them with the mouse.
 
 ### Endpoints on Button Press
-The URL should be a full URL endpoint (ex. "http://localhost:3000/buttonpress"). At the moment, only http://localhost:3000 and http://localhost:8080 are valid base URLs. If you want to use other URLs, setup an endpoint within localhost which redirects to your desired endpoint.
+Only 8080 and 3000 are valid ports (ex. http://localhost:8080/mybutton, your port and endpoint would be "8080/mybutton"). If you want to use other URLs, setup an endpoint within localhost which redirects to your desired endpoint.
 
 The data sent to the endpoint is the data of the clicked button:
 ```
 id: '1683651652707',
-name: 'Button 1',
 text: 'This is a button!',
 width: 200,
 height: 250,

@@ -1,19 +1,35 @@
-I am available May 15th and on, from 9AM-5PM PST.
+I am available from 9AM-5PM PST, any day of the week.
 
-NOTE: At the moment, only http://localhost:3000 and http://localhost:8080 are valid base URLs.
+I don't think it is necessary, but a testing account is as follows:
+email: t4253082@gmail.com
+password: testing_123
+
+twitch: t4253082
+password: testing_for_twitch
+
+
+
+This extension allows viewers to click custom buttons that activate an endpoint the streamer sets up.
+This is a more technical extension and expects you to have knowledge of setting up endpoints on localhost.
+
+NOTE: At the moment, only http://localhost:3000 and http://localhost:8080 are valid URLs due to twitch URL fetching domains.
 
 For ease of use, you can use the provided "server.js" for testing and "buttons.json" for pre-made buttons.
+If using these, start the server by typing "node server.js" in a terminal (assuming the terminal is open in this directory)
+This will host endpoints which change the button's color and text when clicked.
+
+Then you can upload buttons (click upload buttons on the config page and provide "buttons.json") or create your own.
 
 Configuration:
 1. Go to either the live config in the Stream Manager or the Extension config page.
 2. Follow the fields to customize the buttons to your liking.
-3. For URL and method, it helps if you have an endpoint to test. (ex. URL: "http://localhost:3000/yourendpoint", method: GET)
-4. To visualize what the stream will look like, click in the blue area where the buttons get created to upload an image.
+3. For URL and method, it helps if you have an endpoint to test. (ex. URL: "http://localhost:3000/yourendpoint", method: GET or POST).
+4. To visualize what the stream will look like, double click in the blue area where the buttons get created to upload an image.
 5. For additional customization, fill out the css field. Example input: "attribute1": "value1", "attribute2" : "value2", etc.
 
 Using the extension:
-6. Once done, make sure the stream is live and active the extension.
-7. Clicking the button will send the info the the endpoint specified.
+6. Once done, make sure the stream is live and activate the extension.
+7. Clicking the button will send the info to the endpoint specified.
 8. If you want to change something about the button on click, the buttons expect in response the attributes you would like to change. It is easy to do this by simply modifying the data you receive at the endpoint.
 9. You can also send a PubSub request with the buttons you want to modify. IDs of the buttons are found on the config screen. The payload should be as follows:
 message = {
@@ -30,7 +46,7 @@ message = {
     ]
 }
 
+An example of this can be found in server.js at sendPubSubConfig()
 This is useful for resetting buttons, for example.
-
 
 https://www.twitch.tv/jonunji

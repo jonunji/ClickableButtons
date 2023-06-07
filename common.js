@@ -2,12 +2,10 @@ var buttons = [];
 
 function updateButtons(configMode = true) {
     // empty the container with the buttons
-    if (configMode) {
+    if (configMode) 
         $('#draggable-area').empty();
-        $("#download-textarea").val(JSON.stringify(buttons));
-    } else {
+    else 
 	    $('#button-container').empty();
-    }
     
     buttons.forEach(function(buttonData) {
         buttonData["userId"] = userId;
@@ -30,7 +28,7 @@ function updateButtons(configMode = true) {
                 borderStyle: buttonData.borderStyle,
                 borderRadius: buttonData.borderRadius + 'px',
                 borderWidth: buttonData.borderWidth + 'px',
-                font: buttonData.font,
+                'font-family': buttonData.font,
                 fontSize: buttonData.fontSize + 'px',
                 color: buttonData.color,
                 backgroundColor: buttonData.backgroundColor,
@@ -49,6 +47,9 @@ function updateButtons(configMode = true) {
 
             // make sure the buttons stay in the same spot regardless of video size
             if (!configMode) resizeButtons();
+
+            // Stringify the data to be downloaded
+            $("#download-textarea").val(JSON.stringify(buttons));
         }
 
         // draggable when in the configuration
@@ -65,7 +66,8 @@ function updateButtons(configMode = true) {
                     var _button = findButtonById(buttonData.id);
                     _button.posX = xPos;
                     _button.posY = yPos;
-
+                    
+                    selectButton(buttonData)
                     updateData();
                 }
             })
@@ -75,6 +77,9 @@ function updateButtons(configMode = true) {
         // Add an event listener to the button
         $button.on('click', function(event) {
             event.stopPropagation(); // Prevent clicking the draggable area
+
+            if (configMode) 
+                selectButton(buttonData);
 
             // only use the buttons if the checkbox on config.html is selected
             if (!configMode || $("#click-check-box").is(':checked'))
@@ -103,17 +108,16 @@ function updateButtons(configMode = true) {
         
                             // actually change the button
                             updateData();
+
+                            if (configMode) 
+                                selectButton(buttonData);
                         }
                     },
                     error: function(error) {
                         console.error("Error when clicking button:", error);
                     }
-                });
+                })
             }
-
-            // only select when not editing a button
-            if (configMode && !$('#edit-button').hasClass("edit-mode")) 
-                selectButton(buttonData);
         });
 
         if (configMode)

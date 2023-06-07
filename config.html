@@ -5,109 +5,125 @@
   <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
   <script src="jquery-3.6.4.min.js"></script>
   <script src="jquery-ui-1.13.2/jquery-ui.js"></script>
-  <script src="common.js" type="text/javascript"></script>
   <script src="config.js" type="text/javascript"></script>
+  <script src="common.js" type="text/javascript"></script>
   <link rel="stylesheet" href="config.css">
   <link rel="stylesheet" href="jquery-ui-1.13.2/jquery-ui.theme.css">
 </head>
 <body>
   <h1>Button Configuration</h1>
+  <hr>
+  <div id="instructions">
+    <h3>Instructions</h3>
+    <p>- Modify the fields below to your liking.</p>
+    <p>- Click create button.</p>
+    <p>- Click on a button to select it.</p>
+    <p>- You can edit or duplicate the selected button.</p>
+    <p>- Click in the blue box to deselect your button.</p>
+    <p>- Double click the blue box to upload an image (helpful for visualizing stream).</p>
+    <p>- Click submit to send your changes to your stream!</p>
+    <p>- You can use the button's ID along with Twitch's PubSub to update the buttons without clicking on them.</p>
+    <hr>
+    <h4 style="color: rgb(195, 0, 0);"><u>You should have some knowledge of setting up endpoints on localhost.</u></h4>
+    <p>- Only 8080 and 3000 are valid ports (ex. http://localhost:8080/mybutton, your port and endpoint would be "8080/mybutton")</p>
+  </div>
+  <hr>
+  <h3>Download/Upload Buttons</h3>
   <div id="download">
     <!-- add two buttons here, one to downloadButtons, and one to uploadButtons -->
-    <h3>Copy this and place it in a *.json file to be able to upload later.</h3>
+    <h4>Copy this and place it in a *.json file to be able to upload later.</h4>
     <textarea id="download-textarea" readonly></textarea>
   </div>
   <div id="upload">
       <label for="upload-file">Upload Buttons:</label>
       <input type="file" id="upload-file">
   </div>
-  
-  <form id="config-form">
-
-      <label for="button-name">Button Name:</label>
-      <input type="text" id="button-name" name="button-name" value="Button 1"><br>
+  <hr>
+  <div id="button-options">
+    <button type="button" id="create-button">Create Button</button> 
+    <button type="button" id="destroy-button">Delete Button</button>   
+  </div>
+  <div id="checkbox-container">
+    <input type="checkbox" id="click-check-box">
+    <label for="myCheckbox">Enable button clicking while editing</label>
+  </div>
+  <div class="container">
+    <div class="columns-wrapper">
+      <div class="column1">
+        <form id="config-form">        
+            <label for="button-text">Text:</label>
+            <input type="text" id="button-text" name="button-text" value=""><br>
       
-      <label for="button-text">Button Text:</label>
-      <input type="text" id="button-text" name="button-text" value=""><br>
-
-      <label for="button-width">Button Width (pixels):</label>
-      <input type="number" id="button-width" name="button-width" value="100"><br>
-  
-      <label for="button-height">Button Height (pixels):</label>
-      <input type="number" id="button-height" name="button-height" value="50"><br>
-      
-      <label for="button-border-style">Button Border Style:</label>
-      <select id="button-border-style" name="button-border-style">
-        <option value="none">none</option>
-        <option value="hidden">hidden</option>
-        <option value="dotted">dotted</option>
-        <option value="dashed">dashed</option>
-        <option value="solid">solid</option>
-        <option value="double">double</option>
-        <option value="groove">groove</option>
-        <option value="ridge">ridge</option>
-        <option value="inset">inset</option>
-        <option value="outset">outset</option>
-        <option value="initial">initial</option>
-        <option value="inherit">inherit</option>
-      </select><br>
-
-      <label for="button-border-radius">Button Border Radius:</label>
-      <input type="number" id="button-border-radius" name="button-border-radius" value="2"><br>
-  
-      <label for="button-border-width">Button Border Width:</label>
-      <input type="number" id="button-border-width" name="button-border-width" value="2"><br>
-
-      <label for="button-font">Button Font:</label>
-      <input type="text" id="button-font" name="button-font" value="Arial"><br>
-      
-      <label for="button-font-size">Button Font Size:</label>
-      <input type="number" id="button-font-size" name="button-font-size" value="16"><br>
-      
-      <label for="button-color">Button Color:</label>
-      <input type="color" id="button-color" name="button-color" value="#000000"><br>
-      
-      <label for="button-background-color">Button Background Color:</label>
-      <input type="color" id="button-background-color" name="button-background-color" value="#000000"><br>
-      
-      <label for="button-url">Button URL:</label>
-      <input type="text" id="button-url-prefix" value="http://localhost:" disabled>
-      <input type="text" id="button-url-endpoint" name="button-url-endpoint" placeholder="Port and Endpoint"><br>
+            <label for="button-width">Width (pixels):</label>
+            <input type="number" id="button-width" name="button-width" value="100" min="1" oninput="this.value = this.value < 1 ? 1 : this.value"><br>
         
-      <label for="button-method">Button Method:</label>
-      <select id="button-method" name="button-method">
-        <option value="GET">GET</option>
-        <option value="POST">POST</option>
-      </select><br>
-  
-      <label for="button-css">Button Additional CSS:</label>
-      <textarea id="button-css" name="button-css"></textarea><br>
+            <label for="button-height">Height (pixels):</label>
+            <input type="number" id="button-height" name="button-height" value="50" min="1" oninput="this.value = this.value < 1 ? 1 : this.value"><br>
+            
+            <label for="button-border-style">Border Style:</label>
+            <select id="button-border-style" name="button-border-style">
+              <option value="none">none</option>
+              <option value="hidden">hidden</option>
+              <option value="dotted">dotted</option>
+              <option value="dashed">dashed</option>
+              <option value="solid">solid</option>
+              <option value="double">double</option>
+              <option value="groove">groove</option>
+              <option value="ridge">ridge</option>
+              <option value="inset">inset</option>
+              <option value="outset">outset</option>
+              <option value="initial">initial</option>
+              <option value="inherit">inherit</option>
+            </select><br>
       
-    </form>
-    <div id="button-options">
-      <button type="button" id="create-button">Create Button</button>
+            <label for="button-border-radius">Border Radius:</label>
+            <input type="number" id="button-border-radius" name="button-border-radius" value="2" min="1" oninput="this.value = this.value < 1 ? 1 : this.value"><br>
+        
+            <label for="button-border-width">Border Width:</label>
+            <input type="number" id="button-border-width" name="button-border-width" value="2" min="1" oninput="this.value = this.value < 1 ? 1 : this.value"><br>
       
-      <select id="button-dropdown">
-        <option value=""></option>
-      </select>
-  
-      <button type="button" id="edit-button">Edit Button</button>
-      <button type="button" id="destroy-button">Delete Button</button>
-      
+            <label for="button-font">Font:</label>
+            <input type="text" id="button-font" name="button-font" value="Arial"><br>
+            
+            <label for="button-font-size">Font Size:</label>
+            <input type="number" id="button-font-size" name="button-font-size" value="16" min="1" oninput="this.value = this.value < 1 ? 1 : this.value"><br>
+            
+            <label for="button-color">Color:</label>
+            <input type="color" id="button-color" name="button-color" value="#ffffff"><br>
+            
+            <label for="button-background-color">Background Color:</label>
+            <input type="color" id="button-background-color" name="button-background-color" value="#000000"><br>
+            
+            <label for="button-url">URL:</label>
+            <input type="text" id="button-url-prefix" value="http://localhost:" disabled>
+            <input type="text" id="button-url-endpoint" name="button-url-endpoint" placeholder="Port and Endpoint"><br>
+              
+            <label for="button-method">Method:</label>
+            <select id="button-method" name="button-method">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+            </select><br>
+        
+            <label for="button-css">Additional CSS:</label>
+            <textarea id="button-css" name="button-css"></textarea><br>
+            
+        </form>
+      </div>
+      <div class="column2">
+        <!-- <label id="draggable-area-label" for="draggable-area">Double click in the box to upload an image (should be 16:9 as per Twitch video aspect ratio)</label> -->
+        <div class="draggable-container">
+          <div id="draggable-area"></div>
+        </div>
+      </div>
     </div>
-    <div id="checkbox-container">
-      <input type="checkbox" id="click-check-box">
-      <label for="myCheckbox">Enable button clicking while editing</label>
-    </div>
-    <div id="button-id-container">
-      <h3>Use each button's unique ID to make requests, such as modifying buttons.</h2>
-      <h3 id="button-id">Button ID: </h3>
-    </div>
-    <label for="draggable-area">Click in the box to upload an image (should be 16:9 as per Twitch video aspect ratio)</label>
-    <div id="draggable-area">
-    </div>
+  </div>
+  <div id="button-id-container">
+    <h3>Use each button's unique ID to make requests, such as modifying buttons via Twitch's PubSub.</h2>
+    <h3 id="button-id">Button ID: </h3>
+  </div>
   <div id="submit-container">
     <input id="submit" type="submit" value="Submit">
   </div>
 </body>
+
 </html>

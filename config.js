@@ -37,7 +37,7 @@ twitch.configuration.onChanged(function() {
     }
 })
 
-// makes the button data and adds it to the screen and dropdown
+// makes the button data and adds it to the screen
 function createButton() {
 
     // don't make a button if the fields are invalid
@@ -51,30 +51,20 @@ function createButton() {
 
     // refresh the screen
     updateButtons();
-
-    addButtonToDropDown(button);
+    selectButton(button);
 }
 
 // Gets rid of the currently selected button
 function destroyButton() {
-    var id = $('#button-dropdown option:selected').attr('id');
+    var id = selectedButton.data('buttonData').id;
 
     var index = buttons.findIndex(button => button.id == id);
     if (index !== -1) {
       buttons.splice(index, 1);
     }
-    
-    // Remove the currently selected option from the dropdown
-    $('#button-dropdown option:selected').remove();
 
     updateButtons();
     selectButton();
-}
-
-// Given button data, add it to the dropdown
-function addButtonToDropDown(button) {
-    $('#button-dropdown').append(`<option id="${button.id}" value="${button.id}">${button.name}</option>`);
-    selectButton(button);
 }
 
 // Function to find a button by its ID
@@ -82,70 +72,19 @@ function findButtonById(id) {
     return buttons.find(button => button.id == id);
 }
 
-// Makes the currently selected button modifiable
-function editButton() {
-    const editButton = $('#edit-button');
-    const createButton = $('#create-button');
-    const buttonDropDown = $('#button-dropdown');
-    const destroyButton = $('#destroy-button');
-    const id = $('#button-dropdown option:selected').attr('id');
-    const selectedButton = findButtonById(id);
-
-    if (!selectedButton) {
-        // Handle case when no matching button is found
-        console.log("Selected button not found.");
-        return;
-    }
-
-    // Save button was pressed
-    if (editButton.hasClass('edit-mode') && validateForm()) {
-        setButtonVal(selectedButton);
-
-        // Remove edit mode class and update button text
-        editButton.removeClass('edit-mode');
-        editButton.text('Edit Button');
-
-        destroyButton.show();
-        createButton.show();
-        buttonDropDown.show();
-        
-        // Remove live view of editing the button's properties
-        removeOnInputChange('.edit');
-
-        updateButtons();
-        selectButton();
-
-    // Edit button was pressed, toggle to save mode
-    } else {
-        populateFields(selectedButton);
-
-        // Add edit mode class and update button text
-        editButton.addClass('edit-mode');
-        editButton.text('Save Button');
-
-        destroyButton.hide();
-        createButton.hide();
-        buttonDropDown.hide();
-        
-        // Add live view of editing the button's properties
-        addOnInputChange('.edit', function() {
-            setButtonVal(selectedButton); 
-            updateButtons();
-        })
-    }
-}
-
-// Sets the given button as selected, or uses the dropdown to select the button
+// Sets the given button as selected
 function selectButton(buttonData = undefined) {
-    if (buttonData) 
-        $('#button-dropdown option[id="' + buttonData.id + '"]').prop('selected', true);            
-    
-    const id = $('#button-dropdown option:selected').attr('id');
+    const id = buttonData ? buttonData.id : null;
+
+    // Remove live editing the button's properties
+    removeOnInputChange('.edit');
 
     if (selectedButton)
     {
         selectedButton.removeClass('highlight');
         $('#button-id').text("Button ID: ")
+
+        selectedButton = null;
     } 
     
     $('.custom-button').each(function() {
@@ -162,12 +101,27 @@ function selectButton(buttonData = undefined) {
         buttonId.css('color', 'red');
 
         $('#button-id').html("Button ID: ").append(buttonId);
+
+        populateFields(selectedButton.data('buttonData'));
+        $('#create-button').text("Duplicate Button");
+
+        const selectedButtonData = selectedButton.data('buttonData');
+
+        // Add live view of editing the button's properties
+        addOnInputChange('.edit', function() {
+            setButtonVal(selectedButtonData);
+            updateButtons();
+        })
+    }
+    else
+    {
+        $('#config-form')[0].reset();
+        $('#create-button').text("Create Button");
     }
 }
   
 // Sets the properties of a given button's data to the fields in config.html
 function setButtonVal(button) {
-    button.name = $('#button-name').val();
     button.text = $('#button-text').val();
     button.width = parseInt($('#button-width').val());
     button.height = parseInt($('#button-height').val());
@@ -185,7 +139,6 @@ function setButtonVal(button) {
 
 // Sets the fields in config.html to the provided button's properties
 function populateFields(button) {
-    $('#button-name').val(button.name);
     $('#button-text').val(button.text);
     $('#button-width').val(button.width);
     $('#button-height').val(button.height);
@@ -205,9 +158,6 @@ function populateFields(button) {
 
 // Call this at the start so we can load what is currently loaded by the broadcaster
 function loadButtons() {
-    //reset the dropdown
-    $('#button-dropdown').empty();
-
     if(twitch.configuration.broadcaster){
         console.log("config exists")
         try {
@@ -230,11 +180,6 @@ function loadButtonsArray(arr)
 {
     buttons = arr;
     updateButtons();
-
-    // Update the dropdown options
-    buttons.forEach((button) => {
-        addButtonToDropDown(button);
-    });
 }
 
 // Called when submitting the config form
@@ -275,13 +220,7 @@ function sendPubSubConfig() {
 
 // checks that all fields are valid
 function validateForm() {
-    const name = $('#button-name');
-    const width = $('#button-width');
-    const height = $('#button-height');
-    const borderRadius = $('#button-border-radius');
-    const borderWidth = $('#button-border-width');
     const font = $('#button-font');
-    const fontSize = $('#button-font-size');
     const url = $('#button-url-endpoint');
     const css = $('#button-css');
 
@@ -290,49 +229,10 @@ function validateForm() {
     $('.error-message').remove();
 
     var isValid = true;
-
-    if (name.val().trim() === '') {
-        name.addClass('error-field');
-        name.after('<span class="error-message">Please enter a button name</span>');
-        isValid = false;
-    }
-
-    if (isNaN(parseInt(width.val())) || parseInt(width.val()) <= 0) {
-        width.addClass('error-field');
-        width.after('<span class="error-message">Please enter a number greater than 0.</span>');
-        isValid = false;
-    }
-
-    if (isNaN(parseInt(height.val())) || parseInt(height.val()) <= 0) {
-        height.addClass('error-field');
-        height.after('<span class="error-message">Please enter a number greater than 0.</span>');
-        isValid = false;
-    }
-    
-    if (isNaN(parseInt(borderRadius.val())) || parseInt(borderRadius.val()) <= 0)
-    {
-        borderRadius.addClass('error-field');
-        borderRadius.after('<span class="error-message">Please enter a number greater than 0.</span>');
-        isValid = false;
-    }
-    
-    if (isNaN(parseInt(borderWidth.val())) || parseInt(borderWidth.val()) <= 0)
-    {
-        borderWidth.addClass('error-field');
-        borderWidth.after('<span class="error-message">Please enter a number greater than 0.</span>');
-        isValid = false;
-    }
     
     if (font.val().trim() === '') {
         font.addClass('error-field');
         font.after('<span class="error-message">Please enter a valid font.</span>');
-        isValid = false;
-    }
-
-    if (isNaN(parseInt(fontSize.val())) || parseInt(fontSize.val()) <= 0)
-    {
-        fontSize.addClass('error-field');
-        fontSize.after('<span class="error-message">Please enter a number greater than 0.</span>');
         isValid = false;
     }
 
@@ -371,10 +271,9 @@ $(document).ready(function() {
     addOnInputChange('.validation', function() { validateForm() });
 
     $('#create-button').on('click', createButton);
-    $('#button-dropdown').on('change', selectButton);
-    $('#edit-button').on('click', editButton);
     $('#destroy-button').on('click', destroyButton);
-    $('#draggable-area').on('click', uploadPicture);
+    $('#draggable-area').on('dblclick', uploadPicture);
+    $('#draggable-area').on('click', selectButton);
     $('#submit').on('click', updateConfig);
     $('#upload-file').on('change', function() {
         uploadButtons(this.files);
@@ -383,7 +282,6 @@ $(document).ready(function() {
 
 // Adds listeners to input in the provided namespace to the provided callback
 function addOnInputChange(namespace = '', callback) {
-    $('#button-name').on(('input' + namespace), callback);
     $('#button-text').on(('input' + namespace), callback);
     $('#button-width').on(('input' + namespace), callback);
     $('#button-height').on(('input' + namespace), callback);
@@ -394,13 +292,13 @@ function addOnInputChange(namespace = '', callback) {
     $('#button-font-size').on(('input' + namespace), callback);
     $('#button-url-endpoint').on(('input' + namespace), callback);
     $('#button-css').on(('input' + namespace), callback);
+    $('#button-method').on(('input' + namespace), callback);
     $('#button-color').on(('input' + namespace), callback);
     $('#button-background-color').on(('input' + namespace), callback);
 }
 
 // Removes listeners to input of the provided namespace
 function removeOnInputChange(namespace = '') {
-    $('#button-name').off('input' + namespace);
     $('#button-text').off('input' + namespace);
     $('#button-width').off('input' + namespace);
     $('#button-height').off('input' + namespace);
@@ -411,6 +309,7 @@ function removeOnInputChange(namespace = '') {
     $('#button-font-size').off('input' + namespace);
     $('#button-url-endpoint').off('input' + namespace);
     $('#button-css').off('input' + namespace);
+    $('#button-method').off('input' + namespace);
     $('#button-color').off('input' + namespace);
     $('#button-background-color').off('input' + namespace);
 }

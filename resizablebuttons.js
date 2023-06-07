@@ -1,5 +1,5 @@
 // This is the width of the draggable area in config.html
-var targetWidth = 960;
+var targetWidth = 640;
 
 $(document).ready(function() {
     $(window).on('resize', function() { resizeButtons() } );
