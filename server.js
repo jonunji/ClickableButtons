@@ -12,7 +12,7 @@ app.use(cors()); // Enable CORS
 app.use(bodyParser.json())
 
 app.post('/processrequest', (req, res) => {
-    console.log("THE BODY IS: " + req.body);
+    console.log("THE BODY IS: " + JSON.stringify(req.body));
     // Make the nested POST request
     const url = req.body.url;
     const data = req.body.data;
