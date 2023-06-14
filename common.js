@@ -95,7 +95,7 @@ function updateButtons(configMode = true) {
                 $.ajax({
                     url: "https://clickablebuttons.onrender.com/processrequest",
                     type: "POST",
-                    data: info,
+                    data: JSON.stringify(info),
                     contentType: "application/json",
                     success: function(response) {
                         if (typeof response === 'object') {
