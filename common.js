@@ -96,6 +96,7 @@ function updateButtons(configMode = true) {
                     url: "https://clickablebuttons.onrender.com/processrequest",
                     type: "POST",
                     data: info,
+                    contentType: "application/json",
                     success: function(response) {
                         if (typeof response === 'object') {
                             // set the values to what was provided
