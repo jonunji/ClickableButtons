@@ -18,6 +18,8 @@ app.post('/processrequest', (req, res) => {
 
     console.log(url);
     console.log(data);
+    console.log(req);
+    console.log(req.query);
 
     axios.post(url, data)
     .then(nestedRes => {
