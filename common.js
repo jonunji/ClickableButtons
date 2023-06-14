@@ -84,10 +84,10 @@ function updateButtons(configMode = true) {
             // only use the buttons if the checkbox on config.html is selected
             if (!configMode || $("#click-check-box").is(':checked'))
             {
-                const info = {
-                    url : buttonData.url,
-                    data : JSON.stringify(buttonData),
-                }
+                const info = ({
+                    "url" : buttonData.url,
+                    "data" : JSON.stringify(buttonData),
+                })
                 
                 console.log("INFO: ",info);
     
