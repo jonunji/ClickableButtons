@@ -13,13 +13,12 @@ app.use(bodyParser.json())
 
 app.post('/processrequest', (req, res) => {
     // Make the nested POST request
-    const url = req.query.url;
-    const data = req.query.data;
+    const url = req.body.url;
+    const data = req.body.data;
 
     console.log(url);
     console.log(data);
-    console.log(req);
-    console.log(req.query);
+    console.log(req.body);
 
     axios.post(url, data)
     .then(nestedRes => {
