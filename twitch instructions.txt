@@ -10,9 +10,9 @@ password: testing_for_twitch
 
 
 This extension allows viewers to click custom buttons that activate an endpoint the streamer sets up.
-This is a more technical extension and expects you to have knowledge of setting up endpoints on localhost.
+This is a more technical extension and expects you to have knowledge of setting up endpoints.
 
-NOTE: At the moment, only http://localhost:3000 and http://localhost:8080 are valid URLs due to twitch URL fetching domains.
+When the button is pressed, a POST request is sent to the endpoint URL provided in the config.
 
 For ease of use, you can use the provided "server.js" for testing and "buttons.json" for pre-made buttons.
 If using these, start the server by typing "node server.js" in a terminal (assuming the terminal is open in this directory)
@@ -23,7 +23,7 @@ Then you can upload buttons (click upload buttons on the config page and provide
 Configuration:
 1. Go to either the live config in the Stream Manager or the Extension config page.
 2. Follow the fields to customize the buttons to your liking.
-3. For URL and method, it helps if you have an endpoint to test. (ex. URL: "http://localhost:3000/yourendpoint", method: GET or POST).
+3. For URL, it helps if you have an endpoint to test. (ex. URL: "http://localhost:3000/yourendpoint").
 4. To visualize what the stream will look like, double click in the blue area where the buttons get created to upload an image.
 5. For additional customization, fill out the css field. Example input: "attribute1": "value1", "attribute2" : "value2", etc.
 

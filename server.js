@@ -11,14 +11,10 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json())
 
+// Make the nested POST request
 app.post('/processrequest', (req, res) => {
-    console.log("THE BODY IS: " + JSON.stringify(req.body));
-    // Make the nested POST request
     const url = req.body.url;
     const data = req.body.data;
-
-    console.log("THE URL IS: "+ url);
-    console.log("THE DATA IS: " + data);
 
     axios.post(url, data)
     .then(nestedRes => {

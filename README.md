@@ -2,6 +2,8 @@
 
 This Twitch Extension allows creators to add customizable, clickable buttons for users to press.
 
+When the button is pressed, a POST request is sent to the endpoint URL provided in the config.
+
 Each button can be extensively modifies with some of the following properties:
 * Name
 * Text
@@ -15,14 +17,13 @@ Each button can be extensively modifies with some of the following properties:
 * Color
 * Background Color
 * URL (the endpoint upon click)
-* Method (GET/POST)
 * Additional CSS
 
 ## Simple Guide
 Configuration:
 1. Go to either the live config in the Stream Manager or the Extension config page.
 2. Follow the fields to customize the buttons to your liking.
-3. For URL and method, it helps if you have an endpoint to test. (ex. URL: "http://localhost:3000/yourendpoint", method: GET)
+3. For URL, it helps if you have an endpoint to test. (ex. URL: "http://localhost:3000/yourendpoint")
 4. To visualize what the stream will look like, click in the blue area where the buttons get created to upload an image.
 5. For additional customization, fill out the css field. Example input: "attribute1": "value1", "attribute2" : "value2", etc.
 
@@ -73,7 +74,6 @@ fontSize: '16',
 color: '#000000',
 backgroundColor: '#ff0000',
 url: 'http://localhost:3000/buttonpress',
-method: 'GET',
 css: '{}',
 userId: 'U12345678',
 posX: '495.93333435058594',
