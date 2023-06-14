@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const path = require('path');
+const axios = require('axios');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
@@ -9,6 +10,32 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json())
+
+app.post('/processrequest', (req, res) => {
+    // Make the nested POST request
+    const data = {
+        url : req.query.url,
+        data : req.query.data,
+    }
+
+    axios.post(url, data.data)
+    .then(nestedRes => {
+        // Process the response of the nested POST request
+        const nestedResponseData = nestedRes.data;
+
+        // Respond with a success message and updated data
+        // This should be updated button data
+        res.status(200).send(nestedResponseData);
+    })
+    .catch(error => {
+        // Handle errors from the nested POST request
+        console.error('Nested POST request failed:', error);
+
+        // Respond with an error message
+        res.status(500).send('Nested POST request failed');
+    });
+    
+});
 
 app.post('/updateconfig', (req, res) => {
     // Retrieve data from the request

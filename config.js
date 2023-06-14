@@ -132,8 +132,7 @@ function setButtonVal(button) {
     button.fontSize = $('#button-font-size').val();
     button.color = $('#button-color').val();
     button.backgroundColor = $('#button-background-color').val();
-    button.url = 'http://localhost:' + $('#button-url-endpoint').val();
-    button.method = $('#button-method').val();
+    button.url = $('#button-url-endpoint').val();
     button.css = '{' + $('#button-css').val() + '}';
 }
 
@@ -149,8 +148,7 @@ function populateFields(button) {
     $('#button-font-size').val(button.fontSize),
     $('#button-color').val(button.color),
     $('#button-background-color').val(button.backgroundColor),
-    $('#button-url-endpoint').val(button.url.replace('http://localhost:', ''));
-    $('#button-method').val(button.method);
+    $('#button-url-endpoint').val(button.url);
     $('#button-css').val(button.css.slice(1, -1));
 
     validateForm();
@@ -237,10 +235,10 @@ function validateForm() {
     }
 
     // test the endpoint field
-    var urlPattern = /^\d+\/[a-zA-Z0-9_/-]*$/;
+    var urlPattern = /^https?:\/\/(?:www\.)?(?:localhost|(?:[a-zA-Z0-9-]+\.){1,}[a-zA-Z]{2,})(?::\d+)?\/[a-zA-Z0-9_/-]+$/;
     if (!urlPattern.test(url.val())) {
         url.addClass('error-field');
-        url.after('<span class="error-message">Please enter a valid port and endpoint. Format should be ####/{endpoint}</span>');
+        url.after('<span class="error-message">Please enter a valid endpoint URL.');
         isValid = false;
     }
 
@@ -274,7 +272,7 @@ $(document).ready(function() {
     $('#destroy-button').on('click', destroyButton);
     $('#draggable-area').on('dblclick', uploadPicture);
     $('#draggable-area').on('click', selectButton);
-    $('#submit').on('click', updateConfig);
+    $('#submit').on('click', function() { if (validateForm()) updateConfig()});
     $('#upload-file').on('change', function() {
         uploadButtons(this.files);
     });
@@ -292,7 +290,6 @@ function addOnInputChange(namespace = '', callback) {
     $('#button-font-size').on(('input' + namespace), callback);
     $('#button-url-endpoint').on(('input' + namespace), callback);
     $('#button-css').on(('input' + namespace), callback);
-    $('#button-method').on(('input' + namespace), callback);
     $('#button-color').on(('input' + namespace), callback);
     $('#button-background-color').on(('input' + namespace), callback);
 }
@@ -309,7 +306,6 @@ function removeOnInputChange(namespace = '') {
     $('#button-font-size').off('input' + namespace);
     $('#button-url-endpoint').off('input' + namespace);
     $('#button-css').off('input' + namespace);
-    $('#button-method').off('input' + namespace);
     $('#button-color').off('input' + namespace);
     $('#button-background-color').off('input' + namespace);
 }

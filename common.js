@@ -84,21 +84,18 @@ function updateButtons(configMode = true) {
             // only use the buttons if the checkbox on config.html is selected
             if (!configMode || $("#click-check-box").is(':checked'))
             {
-                const info = {}
-                if (buttonData.method == "POST") {
-                    info.data = JSON.stringify(buttonData);
-                    info.contentType = "application/json; charset=utf-8";
-                } else 
-                    info.data = buttonData;
-                    
+                const info = {
+                    url : buttonData.url,
+                    data : JSON.stringify(buttonData),
+                }
+                
                 console.log("INFO: ",info);
     
-                // Make the HTTP request based on the button attributes
+                // Send the URL that wants to be pressed to the backend
                 $.ajax({
-                    url: buttonData.url,
-                    method: buttonData.method,
-                    data: info.data,
-                    contentType: info.contentType,
+                    url: "https://clickablebuttons.onrender.com/processrequest",
+                    type: "POST",
+                    data: info,
                     success: function(response) {
                         if (typeof response === 'object') {
                             // set the values to what was provided
