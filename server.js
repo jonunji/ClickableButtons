@@ -16,6 +16,9 @@ app.post('/processrequest', (req, res) => {
     const url = req.query.url;
     const data = req.query.data;
 
+    console.log(url);
+    console.log(data);
+
     axios.post(url, data)
     .then(nestedRes => {
         // Process the response of the nested POST request
