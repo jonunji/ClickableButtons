@@ -16,7 +16,14 @@ app.post('/processrequest', (req, res) => {
     const url = req.body.url;
     const data = req.body.data;
 
-    axios.post(url, data)
+    // Set the request headers including the Content-Type
+    const config = {
+        headers: {
+        'Content-Type': 'application/json'
+        }
+    };
+
+    axios.post(url, data, config)
     .then(nestedRes => {
         // Process the response of the nested POST request
         const nestedResponseData = nestedRes.data;

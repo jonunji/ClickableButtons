@@ -5,7 +5,6 @@ This Twitch Extension allows creators to add customizable, clickable buttons for
 When the button is pressed, a POST request is sent to the endpoint URL provided in the config.
 
 Each button can be extensively modifies with some of the following properties:
-* Name
 * Text
 * Width
 * Height

@@ -1,0 +1,9 @@
+0.0.1
+Release!
+
+0.0.2
+Clean up the config page
+Use Digital Ocean instead of Render
+Fix buttons resizing when dragging (doesnt seem to happen on localhost)
+Change pictures for new config
+Can use services like ngrok or serveo to access localhost
